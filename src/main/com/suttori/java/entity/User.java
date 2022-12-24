@@ -2,7 +2,6 @@ package entity;
 
 import entity.enams.Role;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class User {

@@ -1,6 +1,5 @@
 package controllers.user;
 
-import entity.User;
 import org.apache.log4j.Logger;
 
 import javax.servlet.RequestDispatcher;

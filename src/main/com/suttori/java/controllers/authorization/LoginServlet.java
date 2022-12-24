@@ -2,6 +2,7 @@ package controllers.authorization;
 
 import entity.User;
 import org.apache.log4j.Logger;
+import service.EmailSenderService;
 import service.UserService;
 
 import javax.servlet.RequestDispatcher;
@@ -42,6 +43,11 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("user", user);
             //локализация
             //remember me
+
+
+            EmailSenderService emailSenderService = new EmailSenderService();
+            emailSenderService.send("Test letter", "Hello!", "kyepta888@gmail.com");
+
 
             Cookie cookie = new Cookie("RepairAgencyCookie", String.valueOf(user.getId()));
             if (remember) {

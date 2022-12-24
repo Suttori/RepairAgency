@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
-import javax.servlet.http.HttpFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -24,22 +23,17 @@ public class SecurityFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
         String uri = req.getServletPath();
+
         if (req.getSession().getAttribute("user") == null) {
             if (!START_PAGES.contains(uri)) {
                 log.info(uri + ": forbidden");
                 resp.sendRedirect("/start-page.jsp");
                 return;
             }
-            log.info(uri + ": access");
-        }
-
-        if (req.getSession().getAttribute("user") != null) {
-            if (START_PAGES.contains(uri)) {
-                log.info(uri + ": forbidden");
-                resp.sendRedirect("/views/profile.jsp");
-                return;
-            }
-            log.info(uri + ": access");
+        } else if (START_PAGES.contains(uri)){
+            log.info(uri + ": forbidden");
+            resp.sendRedirect("/views/profile.jsp");
+            return;
         }
         chain.doFilter(request, response);
     }
