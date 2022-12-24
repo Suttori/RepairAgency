@@ -9,27 +9,27 @@
 
     <servlet>
         <servlet-name>MainServlet</servlet-name>
-        <servlet-class>controllers.authorization.MainServlet</servlet-class>
+        <servlet-class>com.suttori.controllers.authorization.MainServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>LoginServlet</servlet-name>
-        <servlet-class>controllers.authorization.LoginServlet</servlet-class>
+        <servlet-class>com.suttori.controllers.authorization.LoginServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>RegistrationServlet</servlet-name>
-        <servlet-class>controllers.authorization.RegistrationServlet</servlet-class>
+        <servlet-class>com.suttori.controllers.authorization.RegistrationServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ProfileServlet</servlet-name>
-        <servlet-class>controllers.user.ProfileServlet</servlet-class>
+        <servlet-class>com.suttori.controllers.user.ProfileServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ProfileEditServlet</servlet-name>
-        <servlet-class>controllers.user.ProfileEditServlet</servlet-class>
+        <servlet-class>com.suttori.controllers.user.ProfileEditServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>LogoutServlet</servlet-name>
-        <servlet-class>controllers.authorization.LogoutServlet</servlet-class>
+        <servlet-class>com.suttori.controllers.authorization.LogoutServlet</servlet-class>
     </servlet>
 
 
