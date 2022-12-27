@@ -2,21 +2,52 @@ package com.suttori.entity;
 
 import com.suttori.entity.enams.Role;
 
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 import java.util.List;
 
 public class User {
     private int id;
-    private String phoneNumber;
     private String firstName;
     private String lastName;
     private String email;
     private String password;
+    private String phoneNumber;
     private String photo;
+    private String activationCode;
+    private String locale;
+    private byte[] salt;
     private double balance;
     private List<Role> role;
 
-
     public User() {
+    }
+
+    public String getActivationCode() {
+        return activationCode;
+    }
+
+    public void setActivationCode(String activationCode) {
+        this.activationCode = activationCode;
+    }
+
+    public String getLocale() {
+        return locale;
+    }
+
+    public void setLocale(String locale) {
+        this.locale = locale;
+    }
+
+    public byte[] getSalt() {
+        return salt;
+    }
+
+    public void setSalt(byte[] salt) {
+        this.salt = salt;
     }
 
     public int getId() {
@@ -89,6 +120,17 @@ public class User {
 
     public void setRole(List<Role> role) {
         this.role = role;
+    }
+
+    public byte[] hashPassword(String password, byte[] salt) {
+        try {
+            KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);
+            SecretKeyFactory f = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+            return f.generateSecret(spec).getEncoded();
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override

@@ -17,7 +17,7 @@ public class UserDAO implements ElasticDao<User> {
 
     @Override
     public boolean insert(User user) {
-        String insertUser = "INSERT INTO Person(first_name, last_name, email, phone_number, password, balance, photo, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String insertUser = "INSERT INTO Person(first_name, last_name, email, phone_number, password, balance, photo, activation_code, locale, salt, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement preparedStatement = con.prepareStatement(insertUser)) {
             preparedStatement.setString(1, user.getFirstName());
@@ -27,7 +27,10 @@ public class UserDAO implements ElasticDao<User> {
             preparedStatement.setString(5, user.getPassword());
             preparedStatement.setInt(6, 0);
             preparedStatement.setString(7, "defaultProfile.jpg");
-            preparedStatement.setString(8, "USER");
+            preparedStatement.setString(8, user.getActivationCode());
+            preparedStatement.setString(9, user.getLocale());
+            preparedStatement.setBytes(10, user.getSalt());
+            preparedStatement.setString(11, "USER");
             preparedStatement.execute();
             return true;
         } catch (SQLException e) {
@@ -120,6 +123,9 @@ public class UserDAO implements ElasticDao<User> {
         user.setPassword(resultSet.getString("password"));
         user.setBalance(resultSet.getInt("balance"));
         user.setPhoto(resultSet.getString("photo"));
+        user.setActivationCode(resultSet.getString("activation_code"));
+        user.setLocale(resultSet.getString("locale"));
+        user.setSalt(resultSet.getBytes("salt"));
         user.setRole(user.getRole());
         return user;
     }

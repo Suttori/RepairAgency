@@ -2,15 +2,40 @@ package com.suttori.service;
 
 import com.suttori.dao.UserDAO;
 import com.suttori.entity.User;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
+import java.security.SecureRandom;
 
 public class UserService {
     UserDAO userDAO = new UserDAO();
     public String error;
     private final Logger log = Logger.getLogger(UserService.class);
 
-
     public boolean save(User user) {
+        User userFromDB = getUserByEmail(user.getEmail());
+        if(userFromDB != null) {
+            log.info("user already register");
+            error = "emailAlreadyUse";
+            return false;
+        }
+        if (user.getFirstName().length() < 3) {
+            error = "shortFirstNameError";
+            return false;
+        }
+        if (user.getLastName().length() < 3) {
+            error = "lastNameShortError";
+            return false;
+        }
+        if (user.getPassword().length() < 5) {
+            error = "passwordShortError";
+            return false;
+        }
+
+        byte[] salt = generateSalt();
+        user.setSalt(salt);
+        byte[] pass = user.hashPassword(user.getPassword(), salt);
+        String hashedPassword = Hex.encodeHexString(pass);
+        user.setPassword(hashedPassword);
         log.info("save working");
         return userDAO.insert(user);
     }
@@ -21,14 +46,16 @@ public class UserService {
         user.setPassword(password);
         User userFromDB = userDAO.findByEmail(email);
 
-        //хэширование
-
         if (userFromDB == null) {
             log.info("user not register");
             error = "userNotFoundError";
             return false;
         }
-        if (!userFromDB.getPassword().equals(user.getPassword())) {
+
+        byte[] hashPassword = user.hashPassword(user.getPassword(), userFromDB.getSalt());
+        String hashPasswordString = Hex.encodeHexString(hashPassword);
+
+        if (!userFromDB.getPassword().equals(hashPasswordString)) {
             log.info("Passwords do not match");
             error = "passwordError";
             return false;
@@ -104,5 +131,11 @@ public class UserService {
         return true;
     }
 
+    public byte[] generateSalt() {
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[16];
+        random.nextBytes(salt);
+        return salt;
+    }
 
 }

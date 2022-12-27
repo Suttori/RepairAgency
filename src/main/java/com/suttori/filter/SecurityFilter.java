@@ -30,11 +30,12 @@ public class SecurityFilter implements Filter {
                 resp.sendRedirect("/start-page.jsp");
                 return;
             }
-        } else if (START_PAGES.contains(uri)){
-            log.info(uri + ": forbidden");
-            resp.sendRedirect("/views/profile.jsp");
-            return;
         }
+//        } else if (START_PAGES.contains(uri)){
+//                log.info(uri + ": forbidden");
+//                resp.sendRedirect("/views/profile.jsp");
+//                return;
+//            }
         chain.doFilter(request, response);
     }
 

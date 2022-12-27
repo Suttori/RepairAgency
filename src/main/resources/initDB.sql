@@ -7,5 +7,11 @@ create table Person(
                        phone_number varchar NOT NULL UNIQUE,
                        balance float NOT NULL,
                        photo varchar,
+                       activation_code varchar,
+                       locale varchar,
+                       salt varchar,
                        role varchar NOT NULL
 );
+
+
+INSERT INTO Person(first_name, last_name, email, phone_number, password, balance, photo, activation_code, locale, salt, role) VALUES ('test', 'test', '', '0991000000', '', '0', 'photo', '0000', 'locale', '000', 'USER');

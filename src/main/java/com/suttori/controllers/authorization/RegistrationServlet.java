@@ -40,6 +40,8 @@ public class RegistrationServlet extends HttpServlet {
         user.setEmail(req.getParameter("email"));
         user.setPhoneNumber(req.getParameter("phoneNumber"));
         user.setPassword(req.getParameter("password"));
+        //Локализация
+        user.setLocale("Locale");
         if (userService.save(user)) {
             HttpSession session = req.getSession();
             session.setAttribute("user", user);

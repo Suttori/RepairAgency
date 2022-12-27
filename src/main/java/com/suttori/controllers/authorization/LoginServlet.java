@@ -18,12 +18,11 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         logger.info("doGet working");
-        if (req.getSession().getAttribute("user") == null) {
-            HttpSession session = req.getSession();
-            User user = new User();
-            session.setAttribute("user", user);
-
-        }
+//        if (req.getSession().getAttribute("user") == null) {
+//            HttpSession session = req.getSession();
+//            User user = new User();
+//            session.setAttribute("user", user);
+//        }
         RequestDispatcher rd = req.getRequestDispatcher("/start-page.jsp");
         rd.forward(req, resp);
     }
@@ -43,11 +42,6 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("user", user);
             //локализация
             //remember me
-
-
-            EmailSenderService emailSenderService = new EmailSenderService();
-            emailSenderService.send("Test letter", "Hello!", "kyepta888@gmail.com");
-
 
             Cookie cookie = new Cookie("RepairAgencyCookie", String.valueOf(user.getId()));
             if (remember) {

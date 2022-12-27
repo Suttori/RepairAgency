@@ -28,10 +28,9 @@ public class ProjectProperties {
     private static Properties setProperties(){
         Properties props = new Properties();
         try (InputStream resource = ProjectProperties.class.getClassLoader().getResourceAsStream(fileName)) {
-            System.out.println(resource);
             props.load(resource);
         } catch (IOException exception) {
-            System.out.println("----------------------------");
+            System.out.println("---------------------------- smth wrong with property file");
             exception.printStackTrace();
         }
         return props;
