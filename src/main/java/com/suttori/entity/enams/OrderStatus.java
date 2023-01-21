@@ -1,5 +1,5 @@
 package com.suttori.entity.enams;
 
 public enum OrderStatus {
-    PENDING_PAYMENT, PAID, CANCELED
+    ACCEPTED, PENDING_PAYMENT, PAID, CANCELED, IN_PROGRESS, COMPLETED
 }

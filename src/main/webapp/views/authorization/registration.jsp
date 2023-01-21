@@ -9,6 +9,7 @@
 <html>
 <head>
     <title>Реєстрація</title>
+
 </head>
 <body>
 <form action="/registration" method="post">

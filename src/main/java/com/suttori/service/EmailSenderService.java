@@ -16,13 +16,11 @@ public class EmailSenderService {
     private final String password = ProjectProperties.getProperty("mail.password");
 
     public void sendActivationCode(User user) {
+        String message = String.format("Hello, %s, Welcome to Repair Agency, Please visit next link to activation your email:  " +
+        ProjectProperties.getProperty("host") + "/activate/?code=%s", user.getFirstName(), user.getActivationCode());
 
-        send("Test letter", "Hello!", "kyepta888@gmail.com");
-
+        send("Registration on Repair Agency", message, "kyepta888@gmail.com");
     }
-
-
-
 
 
 

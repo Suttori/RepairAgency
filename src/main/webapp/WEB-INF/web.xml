@@ -31,6 +31,26 @@
         <servlet-name>LogoutServlet</servlet-name>
         <servlet-class>com.suttori.controllers.authorization.LogoutServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>EmailSenderServlet</servlet-name>
+        <servlet-class>com.suttori.controllers.authorization.EmailSenderServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>OrderServlet</servlet-name>
+        <servlet-class>com.suttori.controllers.order.OrderServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>OrdersServlet</servlet-name>
+        <servlet-class>com.suttori.controllers.order.OrdersServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ManagerServlet</servlet-name>
+        <servlet-class>com.suttori.controllers.ManagerServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CraftsmanServlet</servlet-name>
+        <servlet-class>com.suttori.controllers.CraftsmanServlet</servlet-class>
+    </servlet>
 
 
 
@@ -57,6 +77,26 @@
     <servlet-mapping>
         <servlet-name>LogoutServlet</servlet-name>
         <url-pattern>/profile/logout</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EmailSenderServlet</servlet-name>
+        <url-pattern>/activate/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OrderServlet</servlet-name>
+        <url-pattern>/profile/addOrder</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OrdersServlet</servlet-name>
+        <url-pattern>/profile/orders</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ManagerServlet</servlet-name>
+        <url-pattern>/views/managerPage</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CraftsmanServlet</servlet-name>
+        <url-pattern>/views/craftsman</url-pattern>
     </servlet-mapping>
 
 

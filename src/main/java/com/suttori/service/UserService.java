@@ -2,13 +2,17 @@ package com.suttori.service;
 
 import com.suttori.dao.UserDAO;
 import com.suttori.entity.User;
+import com.suttori.entity.enams.Role;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
 import java.security.SecureRandom;
+import java.util.List;
+import java.util.UUID;
 
 public class UserService {
     UserDAO userDAO = new UserDAO();
     public String error;
+    EmailSenderService emailSenderService = new EmailSenderService();
     private final Logger log = Logger.getLogger(UserService.class);
 
     public boolean save(User user) {
@@ -26,24 +30,43 @@ public class UserService {
             error = "lastNameShortError";
             return false;
         }
-        if (user.getPassword().length() < 5) {
-            error = "passwordShortError";
-            return false;
-        }
+//        if (user.getPassword().length() < 5) {
+//            error = "passwordShortError";
+//            return false;
+//        }
 
         byte[] salt = generateSalt();
         user.setSalt(salt);
         byte[] pass = user.hashPassword(user.getPassword(), salt);
         String hashedPassword = Hex.encodeHexString(pass);
         user.setPassword(hashedPassword);
+
+        user.setActivationCode(UUID.randomUUID().toString());
+
+        emailSenderService.sendActivationCode(user);
+
         log.info("save working");
         return userDAO.insert(user);
+    }
+
+    public boolean activateEmail(String code) {
+        User user = userDAO.findByActivationCode(code);
+        if (user == null) {
+            error = "emailActivateError";
+            log.info("Email address don't activated");
+            return false;
+        }
+        user.setEmailActivated("true");
+        userDAO.setEmailActivated(user);
+        log.info("Email address activated");
+        return true;
     }
 
     public boolean userLogin(String email, String password) {
         User user = new User();
         user.setEmail(email);
         user.setPassword(password);
+
         User userFromDB = userDAO.findByEmail(email);
 
         if (userFromDB == null) {
@@ -60,6 +83,12 @@ public class UserService {
             error = "passwordError";
             return false;
         }
+
+        if(!userFromDB.getEmailActivated().equals("true")) {
+            log.info("Email not activated");
+            error = "emailActivateError";
+            return false;
+        }
         log.info("User logged in");
         return true;
     }
@@ -70,6 +99,10 @@ public class UserService {
 
     public User getUserById(int id) {
         return userDAO.findById(id);
+    }
+
+    public List<User> getAllMasters() {
+        return userDAO.findByRole(Role.CRAFTSMAN);
     }
 
     public boolean changePassword(User user, String oldPassword, String newPassword, String newPasswordReaped) {

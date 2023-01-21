@@ -7,6 +7,7 @@ import javax.crypto.spec.PBEKeySpec;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
+import java.util.ArrayList;
 import java.util.List;
 
 public class User {
@@ -18,12 +19,29 @@ public class User {
     private String phoneNumber;
     private String photo;
     private String activationCode;
+    private String emailActivated;
     private String locale;
     private byte[] salt;
     private double balance;
-    private List<Role> role;
+    private Role role;
 
     public User() {
+    }
+
+    public boolean isManager() {
+        return role.equals(Role.MANAGER);
+    }
+
+    public boolean isCraftsman() {
+        return role.equals(Role.CRAFTSMAN);
+    }
+
+    public String getEmailActivated() {
+        return emailActivated;
+    }
+
+    public void setEmailActivated(String emailActivated) {
+        this.emailActivated = emailActivated;
     }
 
     public String getActivationCode() {
@@ -114,12 +132,16 @@ public class User {
         this.balance = balance;
     }
 
-    public List<Role> getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(List<Role> role) {
+    public void setRole(Role role) {
         this.role = role;
+    }
+
+    public String getFullName() {
+        return firstName + " " + lastName;
     }
 
     public byte[] hashPassword(String password, byte[] salt) {

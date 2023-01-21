@@ -21,17 +21,16 @@ public class RegistrationServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         log.info("doGet working");
-        if (req.getSession().getAttribute("user") != null) {
-            resp.sendRedirect(req.getContextPath() + "/");
-            return;
-        }
-        RequestDispatcher view = req.getRequestDispatcher("/views/registration.jsp");
+//        if (req.getSession().getAttribute("user") != null) {
+//            resp.sendRedirect(req.getContextPath() + "/");
+//            return;
+//        }
+        RequestDispatcher view = req.getRequestDispatcher("/views/authorization/registration.jsp");
         view.forward(req, resp);
     }
 
-
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         log.info("doPost working");
         UserService userService = new UserService();
         User user = new User();
@@ -45,7 +44,7 @@ public class RegistrationServlet extends HttpServlet {
         if (userService.save(user)) {
             HttpSession session = req.getSession();
             session.setAttribute("user", user);
-            resp.sendRedirect(req.getContextPath() + "/");
+            resp.sendRedirect("/views/authorization/registrationSuccessful.jsp");
             log.info("Registration successful");
         } else {
             log.info("doPost not work");

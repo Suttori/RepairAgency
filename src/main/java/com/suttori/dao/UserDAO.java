@@ -3,21 +3,22 @@ package com.suttori.dao;
 import com.suttori.dao.interfaces.ElasticDao;
 import com.suttori.db.ConnectionManager;
 import com.suttori.entity.User;
+import com.suttori.entity.enams.Role;
 import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserDAO implements ElasticDao<User> {
     private final Logger logger = Logger.getLogger(UserDAO.class);
 
-
     @Override
     public boolean insert(User user) {
-        String insertUser = "INSERT INTO Person(first_name, last_name, email, phone_number, password, balance, photo, activation_code, locale, salt, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String insertUser = "INSERT INTO \"user\"(first_name, last_name, email, phone_number, password, balance, photo, activation_code, email_activated, locale, salt, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement preparedStatement = con.prepareStatement(insertUser)) {
             preparedStatement.setString(1, user.getFirstName());
@@ -28,10 +29,13 @@ public class UserDAO implements ElasticDao<User> {
             preparedStatement.setInt(6, 0);
             preparedStatement.setString(7, "defaultProfile.jpg");
             preparedStatement.setString(8, user.getActivationCode());
-            preparedStatement.setString(9, user.getLocale());
-            preparedStatement.setBytes(10, user.getSalt());
-            preparedStatement.setString(11, "USER");
+            preparedStatement.setString(9, "false");
+            preparedStatement.setString(10, user.getLocale());
+            preparedStatement.setBytes(11, user.getSalt());
+            preparedStatement.setString(12, Role.USER.name());
             preparedStatement.execute();
+
+
             return true;
         } catch (SQLException e) {
             logger.info("error in save method");
@@ -41,7 +45,7 @@ public class UserDAO implements ElasticDao<User> {
 
     @Override
     public User findBy(String byName, int value) {
-        String find = String.format("SELECT * FROM Person WHERE %s = ?", value);
+        String find = String.format("SELECT * FROM \"user\" WHERE %s = ?", value);
         try (Connection con = ConnectionManager.getInstance().getConnection();
             PreparedStatement preparedStatement = con.prepareStatement(find)) {
             preparedStatement.setInt(1, value);
@@ -58,7 +62,7 @@ public class UserDAO implements ElasticDao<User> {
 
     @Override
     public User findBy(String byName, String value) {
-        String find = String.format("SELECT * FROM Person WHERE %s = ?", byName);
+        String find = String.format("SELECT * FROM \"user\" WHERE %s = ?", byName);
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement preparedStatement = con.prepareStatement(find)) {
             preparedStatement.setString(1, value);
@@ -73,6 +77,25 @@ public class UserDAO implements ElasticDao<User> {
         return null;
     }
 
+    public List<User> findByRole(Role role) {
+        String selectUsers = "Select * from \"user\" where role = ?";
+        List<User> craftsmanList = new ArrayList<>();
+        try (Connection con = ConnectionManager.getInstance().getConnection();
+             PreparedStatement preparedStatement = con.prepareStatement(selectUsers)) {
+            preparedStatement.setString(1, role.name());
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                User user = findById(resultSet.getInt("id"));
+                craftsmanList.add(user);
+            }
+            resultSet.close();
+        } catch (SQLException throwable) {
+            throwable.printStackTrace();
+        }
+        return craftsmanList;
+    }
+
     @Override
     public List<User> findBy(String byName, String value, int start, int total) {
         return null;
@@ -85,7 +108,7 @@ public class UserDAO implements ElasticDao<User> {
 
     @Override
     public void setVariable(String variable, int id, String value) {
-        String setPassword = String.format("UPDATE Person SET %s = ? WHERE id = ?", variable);
+        String setPassword = String.format("UPDATE \"user\" SET %s = ? WHERE id = ?", variable);
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement preparedStatement = con.prepareStatement(setPassword)) {
             preparedStatement.setString(1, value);
@@ -124,9 +147,10 @@ public class UserDAO implements ElasticDao<User> {
         user.setBalance(resultSet.getInt("balance"));
         user.setPhoto(resultSet.getString("photo"));
         user.setActivationCode(resultSet.getString("activation_code"));
+        user.setEmailActivated(resultSet.getString("email_activated"));
         user.setLocale(resultSet.getString("locale"));
         user.setSalt(resultSet.getBytes("salt"));
-        user.setRole(user.getRole());
+        user.setRole(Role.valueOf(resultSet.getString("role")));
         return user;
     }
 
@@ -135,9 +159,20 @@ public class UserDAO implements ElasticDao<User> {
         return findBy("email", email);
     }
 
+    public User findByActivationCode(String code) {
+        return findBy("activation_code", code);
+    }
+
     public void setPassword(int id, String password) {
         setVariable("password", id, password);
     }
+
+    public void setEmailActivated(User user) {
+        setVariable("email_activated", user.getId(), user.getEmailActivated());
+    }
+
+
+
 
 
 }

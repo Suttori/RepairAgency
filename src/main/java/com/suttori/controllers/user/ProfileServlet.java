@@ -29,6 +29,11 @@ public class ProfileServlet extends HttpServlet {
             view.forward(req, resp);
             return;
         }
+        if (uri.equals("/profile/addRequest")) {
+            RequestDispatcher view = req.getRequestDispatcher("/views/profile/addOrder.jsp");
+            view.forward(req, resp);
+            return;
+        }
         RequestDispatcher view = req.getRequestDispatcher("/views/profile.jsp");
         view.forward(req, resp);
     }

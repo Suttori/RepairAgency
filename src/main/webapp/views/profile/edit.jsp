@@ -6,12 +6,18 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<html>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page isELIgnored="false"%>
+<!DOCTYPE html>
+<html lang="En">
 <head>
     <title>Зміна профіля</title>
 </head>
 <body>
-<form action="/profile/edit/data" method="post">
+<jsp:include page="../includes/header.jsp"/>
+<div>
+<form action="/profile/edit/data" method="post" title="form">
     Заповніть поля, які хочете змінити
     <br>
     <br>
@@ -56,5 +62,6 @@
         <input value="Змінити пароль" type="submit">
     </div>
 </form>
+</div>
 </body>
 </html>

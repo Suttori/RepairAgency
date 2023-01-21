@@ -15,12 +15,86 @@
 
 </head>
 <body>
-<jsp:include page="../includes/header.jsp"/>
+<jsp:include page="../views/includes/header.jsp"/>
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-2">Тут може бути Ваша реклама</div>
+        <div class="col-2"></div>
         <div class="col-10">
+
+
+            <form method="get" action="/views/managerPage" class="form-inline">
+                <div class="row justify-content-evenly">
+
+                    <div class="col-3">
+                        <select name="master" class="form-control">
+                            <c:choose>
+                                <c:when test="${param['master'] != null && param['master'] != -1}">
+                                    <option selected hidden value="${param["master"]}">
+                                        Майстер
+                                    </option>
+                                    <option value="-1"> Майстер не призначений</option>
+                                </c:when>
+                                <c:otherwise>
+                                    <option value="-1" selected> Всі майстри </option>
+                                </c:otherwise>
+                            </c:choose>
+                            <c:forEach var="master" items="${masters}">
+                                <option value="${master.id}">${master.fullName}
+                                    , ${master.email}</option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                    <div class="col-3">
+                        <select name="status" class="form-control ml-2">
+                            <option value="ALL"> Всі</option>
+                            <c:choose>
+                                <c:when test="${param['status'] != null}">
+                                    <option selected hidden value="${param['status']}">
+                                        <fmt:message key="${param['status']}"/>
+                                    </option>
+                                    <option value="ACCEPTED">ACCEPTED</option>
+                                </c:when>
+                                <c:otherwise>
+                                    <option value="ACCEPTED" selected>ACCEPTED</option>
+                                </c:otherwise>
+                            </c:choose>
+                            <option value="PENDING_PAYMENT">PENDING_PAYMENT</option>
+                            <option value="PAID">PAID</option>
+                            <option value="CANCELED">CANCELED</option>
+                            <option value="IN_PROGRESS">IN_PROGRESS</option>
+                            <option value="COMPLETED">COMPLETED</option>
+                        </select>
+                    </div>
+
+                    <div class="col-3">
+                        <select name="sort" class="form-control ml-2">
+                            <c:choose>
+                                <c:when test="${param['sort'] != null}">
+                                    <option selected hidden value="${param['sort']}">
+                                        <fmt:message key="${param['sort']}"/>
+                                    </option>
+                                    <option value="none">none</option>
+                                </c:when>
+                                <c:otherwise>
+                                    <option value="none" selected> Без сортування</option>
+                                </c:otherwise>
+                            </c:choose>
+                            <option value="date ASC">date ASC</option>
+                            <option value="date DESC">date DESC</option>
+                            <option value="price ASC">price ASC</option>
+                            <option value="price DESC">price DESC</option>
+                        </select>
+                    </div>
+                    <div class="col-3">
+                        <button type="submit" class="btn btn-primary ml-2"> Пошук </button>
+                    </div>
+
+                </div>
+            </form>
+
+            <br>
+
             <div class="row row-cols-1 row-cols-md-3 g-4">
                 <c:forEach var="order" items="${orders}">
                     <div class="col">
@@ -53,7 +127,7 @@
                 </c:forEach>
             </div>
             <br>
-            <jsp:include page="../includes/pagination.jsp"/>
+            <jsp:include page="../views/includes/paginationManager.jsp"/>
         </div>
     </div>
 </div>
