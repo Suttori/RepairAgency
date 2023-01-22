@@ -162,6 +162,33 @@ public class OrderDAO implements ElasticDao<Order> {
         return null;
     }
 
+
+    @Override
+    public void setVariable(String variable, int orderId, String value) {
+        String set = String.format("UPDATE \"order\" SET %s = ? WHERE id = ?", variable);
+        try (Connection connection = ConnectionManager.getInstance().getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(set)) {
+            preparedStatement.setString(1, value);
+            preparedStatement.setInt(2, orderId);
+            preparedStatement.execute();
+        } catch (SQLException throwable) {
+            throwable.printStackTrace();
+        }
+    }
+
+    @Override
+    public void setVariable(String variable, int orderId, int value) {
+        String set = String.format("UPDATE \"order\" SET %s = ? WHERE id = ?", variable);
+        try (Connection connection = ConnectionManager.getInstance().getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(set)) {
+            preparedStatement.setInt(1, value);
+            preparedStatement.setInt(2, orderId);
+            preparedStatement.execute();
+        } catch (SQLException throwable) {
+            throwable.printStackTrace();
+        }
+    }
+
     @Override
     public Order buildObjectFromResultSet(ResultSet resultSet) throws SQLException {
         Order order = new Order();
@@ -177,6 +204,20 @@ public class OrderDAO implements ElasticDao<Order> {
         return order;
     }
 
+
+
+
+    public void setStatus(int id, OrderStatus status){
+        setVariable("status", id, status.name());
+    }
+
+    public void setPrice(int id, int price){
+        setVariable("price", id, price);
+    }
+
+    public void setMaster(int id, int masterId){
+        setVariable("craftsman_id", id, masterId);
+    }
 
     @Override
     public Order findBy(String byName, int value) {
@@ -198,13 +239,5 @@ public class OrderDAO implements ElasticDao<Order> {
         return null;
     }
 
-    @Override
-    public void setVariable(String variable, int id, String value) {
 
-    }
-
-    @Override
-    public void setVariable(String variable, int id, int value) {
-
-    }
 }

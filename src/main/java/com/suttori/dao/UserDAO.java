@@ -45,7 +45,7 @@ public class UserDAO implements ElasticDao<User> {
 
     @Override
     public User findBy(String byName, int value) {
-        String find = String.format("SELECT * FROM \"user\" WHERE %s = ?", value);
+        String find = String.format("SELECT * FROM \"user\" WHERE %s = ?", byName);
         try (Connection con = ConnectionManager.getInstance().getConnection();
             PreparedStatement preparedStatement = con.prepareStatement(find)) {
             preparedStatement.setInt(1, value);
@@ -83,7 +83,6 @@ public class UserDAO implements ElasticDao<User> {
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement preparedStatement = con.prepareStatement(selectUsers)) {
             preparedStatement.setString(1, role.name());
-
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 User user = findById(resultSet.getInt("id"));

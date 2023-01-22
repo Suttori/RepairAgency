@@ -3,6 +3,7 @@ package com.suttori.service;
 import com.suttori.dao.OrderDAO;
 import com.suttori.dao.UserDAO;
 import com.suttori.entity.Order;
+import com.suttori.entity.User;
 import com.suttori.entity.enams.OrderStatus;
 import com.suttori.entity.enams.Role;
 import org.apache.log4j.Logger;
@@ -40,6 +41,29 @@ public class OrderService {
     public List<Order> getOrdersAll(int startPosition, int total) {
         return orderDAO.findAll(startPosition, total);
     }
+
+    public boolean saveManagerAnswer(int price, int masterId, int orderId) {
+        if (price < 5) {
+            logger.info("Manager set low price");
+            error = "priceLowError";
+            return false;
+        }
+        orderDAO.setPrice(orderId, price);
+        orderDAO.setMaster(orderId, masterId);
+        setOrderStatus(orderId, OrderStatus.PENDING_PAYMENT);
+        logger.info("Manager check order");
+        return true;
+    }
+
+    public void setOrderStatus(int orderId, OrderStatus status) {
+        orderDAO.setStatus(orderId, status);
+
+//        Order order = orderDAO.findById(orderId);
+//        User user = orderDAO.findById(order.getUserId());
+//        mailSender.sendOrderStatusUpdate(user, order);
+//        log.info("Order " + orderId + " get status: " + status.name());
+    }
+
 
     public List<Order> getSortedOrders(String masterId, String status, String sort, int startPosition, int totalOrders) {
         StringBuilder stringBuilder = new StringBuilder();

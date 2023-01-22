@@ -29,7 +29,6 @@ public class ManagerServlet extends HttpServlet {
             page = Integer.parseInt(req.getParameter("page"));
         }
 
-
         //количесвто строк, которое необходимо пропустить
         int startPosition = page * ordersOnPage - ordersOnPage;
         OrderService orderService = new OrderService();
@@ -45,14 +44,23 @@ public class ManagerServlet extends HttpServlet {
         UserService userService = new UserService();
         List<User> masters = userService.getAllMasters();
         req.setAttribute("masters", masters);
-
-
         RequestDispatcher view = req.getRequestDispatcher("/views/managerPage.jsp");
         view.forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doPost(req, resp);
+        int masterId = Integer.parseInt(req.getParameter("selectedMaster"));
+        int orderId = Integer.parseInt(req.getParameter("orderId"));
+        int price = Integer.parseInt(req.getParameter("price"));
+
+        OrderService orderService = new OrderService();
+        if(orderService.saveManagerAnswer(price, masterId, orderId)){
+            resp.sendRedirect(req.getContextPath() + "/views/managerPage");
+
+        }else{
+            req.setAttribute("error", orderService.error);
+            doGet(req, resp);
+        }
     }
 }

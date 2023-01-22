@@ -66,7 +66,6 @@
                             <option value="COMPLETED">COMPLETED</option>
                         </select>
                     </div>
-
                     <div class="col-3">
                         <select name="sort" class="form-control ml-2">
                             <c:choose>
@@ -90,6 +89,7 @@
                         <button type="submit" class="btn btn-primary ml-2"> Пошук </button>
                     </div>
 
+
                 </div>
             </form>
 
@@ -109,16 +109,44 @@
                                         data-bs-whatever="${order.description}"> Переглянути детальний опис проблеми
                                 </button>
                                 <br>
+                                <br>
+                                <c:set var="orderUser" value="${order.getUser()}"/>
+                                <h6 class="mt-0"> Замовник: ${orderUser.fullName}</h6>
+                                <br>
                                 <c:if test="${order.craftsmanId > 0}">
                                     <c:set var="orderCraftsman" value="${order.getCraftsman()}"/>
-                                    <h6 class="card-subtitle mb-2"> Майстер: ${orderCraftsman.getFullName()}</h6>
-                                    <h6 class="card-subtitle mb-2"> Майстер: ${order.getCraftsman()}</h6>
+                                    <h6 class="card-subtitle mb-2"> Майстер: ${orderCraftsman.id} ${orderCraftsman.getFullName()} </h6>
                                 </c:if>
                                 <c:if test="${order.price > 0}">
                                     <br>
                                     <h6 class="card-subtitle mb-2"> Вартість послуги: ${order.price}</h6>
                                 </c:if>
+
+                                <c:if test="${order.isNew()}">
+                                <div class="dropdown-divider"></div>
+                                <form action="/views/managerPage" method="post">
+                                    <input type="hidden" name="orderId" value="${order.id}">
+                                    <div class="form-group">
+                                        <h6 class="card-subtitle mb-2"> Призначити майстра: </h6>
+
+                                        <select required name="selectedMaster" class="form-control">
+                                            <c:forEach var="master" items="${masters}">
+                                                <option value="${master.id}">${master.fullName}
+                                                    , ${master.email}</option>
+                                            </c:forEach>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Вартість послуги: </label>
+                                        <input required type="number" name="price" class="form-control">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Призначити</button>
+                                </form>
+                                </c:if>
+
                             </div>
+
+
                             <div class="card-footer">
                                 <small class="text-muted"> Дата замовлення: ${order.date}</small>
                             </div>

@@ -97,6 +97,16 @@ public class Order {
         UserService userService = new UserService();
         return userService.getUserById(userId);
     }
+
+    public boolean isNew() {
+        return status.equals(OrderStatus.ACCEPTED);
+    }
+
+    public boolean isPendingPayment() {
+        return status.equals(OrderStatus.PENDING_PAYMENT);
+    }
+
+
     @Override
     public String toString() {
         return "Order{" +
