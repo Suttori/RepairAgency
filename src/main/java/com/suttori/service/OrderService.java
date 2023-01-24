@@ -3,12 +3,13 @@ package com.suttori.service;
 import com.suttori.dao.OrderDAO;
 import com.suttori.dao.UserDAO;
 import com.suttori.entity.Order;
-import com.suttori.entity.User;
 import com.suttori.entity.enams.OrderStatus;
-import com.suttori.entity.enams.Role;
 import org.apache.log4j.Logger;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class OrderService {
@@ -38,9 +39,12 @@ public class OrderService {
         return orderDAO.findByUser("user_id", userId, startPosition, total);
     }
 
-    public List<Order> getOrdersAll(int startPosition, int total) {
-        return orderDAO.findAll(startPosition, total);
-    }
+//    public List<Order> getOrdersAll(int startPosition, int total) {
+//        return orderDAO.findAll(startPosition, total);
+//    }
+
+
+
 
     public boolean saveManagerAnswer(int price, int masterId, int orderId) {
         if (price < 5) {
@@ -65,42 +69,38 @@ public class OrderService {
     }
 
 
-    public List<Order> getSortedOrders(String masterId, String status, String sort, int startPosition, int totalOrders) {
-        StringBuilder stringBuilder = new StringBuilder();
 
-        boolean needSortMaster = false;
-        boolean needSortStatus = false;
+    public Order getById(int id) {
+        return orderDAO.findById("id", id);
+    }
 
-        //Все мастера, все статусы, нет сортировки
-        if ((masterId == null || masterId.equals("-1")) && (status == null || status.equals("ALL")) && (sort == null || sort.equals("none"))) {
-            return orderDAO.findAll(startPosition, totalOrders);
-        }
+
+    public List<Order> getSortedOrders(boolean sortForUser, int userId, String masterId, String status, String sort, int startPosition, int totalOrders) {
+        Map<String, Object> filterParams = new HashMap<>();
+        //Map<String, SortingParams> sortingParams = null;
+        String sortingParams = null;
+        Map<String, Integer> limitingParams = new LinkedHashMap<>();
 
         if (masterId != null && !masterId.equals("-1")) {
-            stringBuilder.append("WHERE craftsman_id = ? ");
-            needSortMaster = true;
+            filterParams.put("craftsman_id", Integer.parseInt(masterId));
         }
 
-        if (!needSortMaster && status != null && !status.equals("ALL")) {
-            stringBuilder.append("WHERE status = ? ");
+        if (status != null && !status.equals("ALL")) {
+            filterParams.put("status", status);
         }
 
-        if (needSortMaster && status != null && !status.equals("ALL")) {
-            stringBuilder.append("AND status = ? ");
-            needSortStatus = true;
+        if (sortForUser) {
+            filterParams.put("user_id", userId);
         }
 
         if (sort != null && !sort.equals("none")) {
-            stringBuilder.append("ORDER BY ").append(sort);
+            sortingParams = sort;
         }
 
-        String findBy = String.valueOf(stringBuilder);
+        limitingParams.put("LIMIT" , totalOrders);
+        limitingParams.put("OFFSET" , startPosition);
 
-        if (needSortMaster && needSortStatus) {
-            return orderDAO.findBy(findBy, Integer.parseInt(masterId), status, startPosition, totalOrders);
-        } else if (needSortMaster){
-            return orderDAO.findByMaster(findBy, Integer.parseInt(masterId), startPosition, totalOrders);
-        } else return orderDAO.findByStatus(findBy, status, startPosition, totalOrders);
+        return orderDAO.findBy(filterParams, sortingParams, limitingParams);
     }
 
     //забираем количество строк

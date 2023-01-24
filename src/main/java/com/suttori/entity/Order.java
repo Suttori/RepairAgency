@@ -106,6 +106,22 @@ public class Order {
         return status.equals(OrderStatus.PENDING_PAYMENT);
     }
 
+    public boolean isPaid() {
+        return status.equals(OrderStatus.PAID);
+    }
+
+    public boolean isCanceled() {
+        return status.equals(OrderStatus.CANCELED);
+    }
+
+    public boolean isInProgress() {
+        return status.equals(OrderStatus.IN_PROGRESS);
+    }
+
+    public boolean isCompleted() {
+        return status.equals(OrderStatus.COMPLETED);
+    }
+
 
     @Override
     public String toString() {

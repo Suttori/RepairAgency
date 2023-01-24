@@ -19,13 +19,18 @@
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-2">Тут може бути Ваша реклама</div>
+        <div class="col-2">
+            <c:if test="${message != null}">
+                <div class="alert alert-success" role="alert">
+                    Ваш рахунок поповнено! Ви можете знайти та сплатити за своє замовлення на цій сторінці.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Закрыть"></button>
+                </div>
+            </c:if>
+            Тут може бути Ваша реклама
+        </div>
         <div class="col-10">
-
-
             <form method="get" action="/profile/orders" class="form-inline">
                 <div class="row justify-content-evenly">
-
                     <div class="col-3">
                         <select name="master" class="form-control">
                             <c:choose>
@@ -36,7 +41,7 @@
                                     <option value="-1"> Майстер не призначений</option>
                                 </c:when>
                                 <c:otherwise>
-                                    <option value="-1" selected> Всі майстри </option>
+                                    <option value="-1" selected> Всі майстри</option>
                                 </c:otherwise>
                             </c:choose>
                             <c:forEach var="master" items="${masters}">
@@ -86,21 +91,20 @@
                         </select>
                     </div>
                     <div class="col-3">
-                        <button type="submit" class="btn btn-primary ml-2"> Пошук </button>
+                        <button type="submit" class="btn btn-primary ml-2"> Пошук</button>
                     </div>
-
-
                 </div>
             </form>
-
             <br>
-
             <div class="row row-cols-1 row-cols-md-3 g-4">
                 <c:forEach var="order" items="${orders}">
                     <div class="col">
                         <div class="card h-100">
                             <div class="card-body">
-                                <h5 class="card-title"> Проблема: ${order.orderName}</h5>
+                                <h5 class="card-title"> Проблема: ${order.orderName}
+
+
+                                </h5>
                                 <br>
                                 <h6 class="card-subtitle mb-2"> Статус: ${order.status}</h6>
                                 <br>
@@ -120,23 +124,34 @@
                                     <h6 class="card-subtitle mb-2"> Вартість послуги: ${order.price}</h6>
                                 </c:if>
 
-
-
                                 <c:if test="${order.isPendingPayment()}">
                                     <form action="/payment" method="get">
                                         <input type="hidden" name="orderId" value="${order.id}">
-                                        <button type="submit" class="btn btn-primary"> Сплатити </button>
+                                        <button type="submit" class="btn btn-primary"> Сплатити</button>
                                     </form>
                                 </c:if>
 
 
-
-
                             </div>
+
                             <div class="card-footer">
-                                <small class="text-muted"> Дата замовлення: ${order.date}</small>
+                                <div class="row">
+                                    <div class="col">
+                                        <small class="text-muted"> Дата замовлення: ${order.date}</small>
+                                    </div>
+                                    <div class="col">
+                                        <c:if test="${!order.isCanceled() && !order.isCompleted()}">
+                                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                                <a href="/profile/orders/cancel?orderId=${order.id}"
+                                                   class="btn btn-outline-danger btn-sm float-right"> Скасувати
+                                                    замовлення</a>
+                                            </div>
+                                        </c:if>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+
                     </div>
                 </c:forEach>
             </div>
@@ -145,6 +160,7 @@
         </div>
     </div>
 </div>
+
 <!-- Модальное окно -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">

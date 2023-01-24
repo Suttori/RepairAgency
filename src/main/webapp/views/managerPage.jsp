@@ -67,6 +67,7 @@
                         </select>
                     </div>
                     <div class="col-3">
+
                         <select name="sort" class="form-control ml-2">
                             <c:choose>
                                 <c:when test="${param['sort'] != null}">
@@ -79,6 +80,7 @@
                                     <option value="none" selected> Без сортування</option>
                                 </c:otherwise>
                             </c:choose>
+
                             <option value="date ASC">date ASC</option>
                             <option value="date DESC">date DESC</option>
                             <option value="price ASC">price ASC</option>
@@ -148,7 +150,43 @@
 
 
                             <div class="card-footer">
-                                <small class="text-muted"> Дата замовлення: ${order.date}</small>
+                                <div class="row">
+                                    <div class="col">
+                                        <small class="text-muted"> Дата замовлення: ${order.date}</small>
+                                    </div>
+                                    <div class="col">
+                                        <div class="dropdown gap-2 d-md-flex justify-content-md-end">
+                                            <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Змінити статус
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <c:if test="${!order.isPendingPayment()}">
+                                                <li><a class="dropdown-item" href="/views/managerPage/isPendingPayment?orderId=${order.id}">Очікує сплати</a></li>
+                                                </c:if>
+                                                <c:if test="${!order.isPaid()}">
+                                                <li><a class="dropdown-item" href="/views/managerPage/isPaid?orderId=${order.id}">Сплачено</a></li>
+                                                </c:if>
+                                                <c:if test="${!order.isCanceled()}">
+                                                <li><a class="dropdown-item" href="/views/managerPage/cancel?orderId=${order.id}">Скасовано</a></li>
+                                                </c:if>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+<%--                                    <c:if test="${!order.isCanceled() && !order.isCompleted()}">--%>
+<%--                                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">--%>
+<%--                                            <a href="/views/managerPage/cancel?orderId=${order.id}"--%>
+<%--                                               class="btn btn-outline-danger btn-sm float-right"> Скасувати--%>
+<%--                                                замовлення</a>--%>
+<%--                                        </div>--%>
+<%--                                    </c:if>--%>
+
+
+
+
+
+
+                                </div>
                             </div>
                         </div>
                     </div>

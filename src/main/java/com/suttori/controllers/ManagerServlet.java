@@ -2,6 +2,7 @@ package com.suttori.controllers;
 
 import com.suttori.entity.Order;
 import com.suttori.entity.User;
+import com.suttori.entity.enams.OrderStatus;
 import com.suttori.service.OrderService;
 import com.suttori.service.UserService;
 
@@ -19,6 +20,10 @@ public class ManagerServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        if (changeStatus(req, resp)) {
+            return;
+        }
+
         String masterId = req.getParameter("master");
         String status = req.getParameter("status");
         String sort = req.getParameter("sort");
@@ -32,10 +37,10 @@ public class ManagerServlet extends HttpServlet {
         //количесвто строк, которое необходимо пропустить
         int startPosition = page * ordersOnPage - ordersOnPage;
         OrderService orderService = new OrderService();
-       // List<Order> orders = orderService.getOrdersAll(startPosition, ordersOnPage);
-        List<Order> orders = orderService.getSortedOrders(masterId, status, sort, startPosition, ordersOnPage);
+
+        List<Order> orders = orderService.getSortedOrders(false, 0, masterId, status, sort, startPosition, ordersOnPage);
         //количество страниц с записями
-        int nOfPages = (int)Math.ceil(orderService.getNumberOfRows() * 1.0 / ordersOnPage);
+        int nOfPages = (int) Math.ceil(orderService.getNumberOfRows() * 1.0 / ordersOnPage);
 
         req.setAttribute("orders", orders);
         req.setAttribute("nOfPages", nOfPages);
@@ -55,12 +60,31 @@ public class ManagerServlet extends HttpServlet {
         int price = Integer.parseInt(req.getParameter("price"));
 
         OrderService orderService = new OrderService();
-        if(orderService.saveManagerAnswer(price, masterId, orderId)){
+        if (orderService.saveManagerAnswer(price, masterId, orderId)) {
             resp.sendRedirect(req.getContextPath() + "/views/managerPage");
-
-        }else{
+        } else {
             req.setAttribute("error", orderService.error);
             doGet(req, resp);
         }
+    }
+
+    private boolean changeStatus(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        if (req.getRequestURI().equals("/views/managerPage/cancel")) {
+            OrderService orderService = new OrderService();
+            orderService.setOrderStatus(Integer.parseInt(req.getParameter("orderId")), OrderStatus.CANCELED);
+            resp.sendRedirect(req.getContextPath() + "/views/managerPage");
+            return true;
+        } else if (req.getRequestURI().equals("/views/managerPage/isPendingPayment")) {
+            OrderService orderService = new OrderService();
+            orderService.setOrderStatus(Integer.parseInt(req.getParameter("orderId")), OrderStatus.PENDING_PAYMENT);
+            resp.sendRedirect(req.getContextPath() + "/views/managerPage");
+            return true;
+        } else if (req.getRequestURI().equals("/views/managerPage/isPaid")) {
+            OrderService orderService = new OrderService();
+            orderService.setOrderStatus(Integer.parseInt(req.getParameter("orderId")), OrderStatus.PAID);
+            resp.sendRedirect(req.getContextPath() + "/views/managerPage");
+            return true;
+        }
+        return false;
     }
 }

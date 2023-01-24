@@ -8,16 +8,57 @@
     <jsp:include page="../includes/links.jsp"/>
     <title>Bootstrap Example</title>
     <c:set var="user" value='${sessionScope["user"]}'/>
+    <fmt:setLocale value="${sessionScope.lang}"/>
 </head>
 
 <body class="p-3 m-0 border-0 bd-example">
 <nav class="navbar navbar-dark bg-dark fixed-top">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#"> Ремонтна Агенція "Назва"</a>
+        <a class="navbar-brand" href="/views/profile.jsp"> Ремонтна Агенція "Назва"</a>
+
+        <div class="container">
+            <ul class="nav justify-content-end">
+                <li class="nav-item">
+
+
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            <c:out value="${user.balance}"/> UAH
+                        </button>
+                        <form class="dropdown-menu p-3" action="/payment" method="post">
+                            <div class="mb-3" >
+                                <label for="sum" class="form-label"> Поповнення рахунку </label>
+                                <input type="text" class="form-control" name="sum" id="sum" placeholder="Введіть суму">
+                            </div>
+                            <button type="submit" class="btn btn-primary"> Поповнити </button>
+                        </form>
+                    </div>
+                </li>
+                <li>
+                    <label>__</label>
+                </li>
+                <li class="nav-item">
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            <%--                            <c:out value="${sessionScope.lang}"/>--%>
+                            Lang
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="?lang=En">En</a></li>
+                            <li><a class="dropdown-item" href="?lang=Ua">Ua</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div>
         <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar"
                 aria-controls="offcanvasDarkNavbar">
             <span class="navbar-toggler-icon"></span>
         </button>
+
+
         <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar"
              aria-labelledby="offcanvasDarkNavbarLabel">
             <div class="offcanvas-header">
@@ -38,12 +79,14 @@
                     </li>
                     <c:if test="${user.isManager()}">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/views/managerPage"> Сторінка менеджера </a>
+                            <a class="nav-link active" aria-current="page" href="/views/managerPage"> Сторінка
+                                менеджера </a>
                         </li>
                     </c:if>
                     <c:if test="${user.isCraftsman()}">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/views/craftsman"> Сторінка майстра </a>
+                            <a class="nav-link active" aria-current="page" href="/views/craftsman"> Сторінка
+                                майстра </a>
                         </li>
                     </c:if>
                     <li class="nav-item">

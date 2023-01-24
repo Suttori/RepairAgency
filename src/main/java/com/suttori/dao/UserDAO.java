@@ -2,6 +2,7 @@ package com.suttori.dao;
 
 import com.suttori.dao.interfaces.ElasticDao;
 import com.suttori.db.ConnectionManager;
+import com.suttori.entity.Order;
 import com.suttori.entity.User;
 import com.suttori.entity.enams.Role;
 import org.apache.log4j.Logger;
@@ -12,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class UserDAO implements ElasticDao<User> {
     private final Logger logger = Logger.getLogger(UserDAO.class);
@@ -41,6 +43,11 @@ public class UserDAO implements ElasticDao<User> {
             logger.info("error in save method");
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public List<User> findBy(Map<String, Object> filterParams, String sortingParams, Map<String, Integer> limitingParams) {
+        return null;
     }
 
     @Override
@@ -77,6 +84,11 @@ public class UserDAO implements ElasticDao<User> {
         return null;
     }
 
+    @Override
+    public Order findById(String variable, int id) {
+        return null;
+    }
+
     public List<User> findByRole(Role role) {
         String selectUsers = "Select * from \"user\" where role = ?";
         List<User> craftsmanList = new ArrayList<>();
@@ -96,16 +108,6 @@ public class UserDAO implements ElasticDao<User> {
     }
 
     @Override
-    public List<User> findBy(String byName, String value, int start, int total) {
-        return null;
-    }
-
-    @Override
-    public List<User> findBy(String byName, int value, int start, int total) {
-        return null;
-    }
-
-    @Override
     public void setVariable(String variable, int id, String value) {
         String setPassword = String.format("UPDATE \"user\" SET %s = ? WHERE id = ?", variable);
         try (Connection con = ConnectionManager.getInstance().getConnection();
@@ -121,6 +123,19 @@ public class UserDAO implements ElasticDao<User> {
     @Override
     public void setVariable(String variable, int id, int value) {
 
+    }
+
+    @Override
+    public void setVariable(String variable, int id, float value) {
+        String setBalance = String.format("UPDATE \"user\" SET %s = ? WHERE id = ?", variable);
+        try (Connection con = ConnectionManager.getInstance().getConnection();
+             PreparedStatement preparedStatement = con.prepareStatement(setBalance)) {
+            preparedStatement.setFloat(1, value);
+            preparedStatement.setInt(2, id);
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -168,6 +183,10 @@ public class UserDAO implements ElasticDao<User> {
 
     public void setEmailActivated(User user) {
         setVariable("email_activated", user.getId(), user.getEmailActivated());
+    }
+
+    public void setBalance(int userId, float balance){
+        setVariable("balance", userId, balance);
     }
 
 

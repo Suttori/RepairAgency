@@ -51,6 +51,11 @@
         <servlet-name>CraftsmanServlet</servlet-name>
         <servlet-class>com.suttori.controllers.CraftsmanServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>PaymentServlet</servlet-name>
+        <servlet-class>com.suttori.controllers.order.PaymentServlet</servlet-class>
+    </servlet>
+
 
 
 
@@ -88,17 +93,20 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>OrdersServlet</servlet-name>
-        <url-pattern>/profile/orders</url-pattern>
+        <url-pattern>/profile/orders/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ManagerServlet</servlet-name>
-        <url-pattern>/views/managerPage</url-pattern>
+        <url-pattern>/views/managerPage/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>CraftsmanServlet</servlet-name>
         <url-pattern>/views/craftsman</url-pattern>
     </servlet-mapping>
-
+    <servlet-mapping>
+        <servlet-name>PaymentServlet</servlet-name>
+        <url-pattern>/payment/*</url-pattern>
+    </servlet-mapping>
 
 
 

@@ -22,7 +22,7 @@ public class User {
     private String emailActivated;
     private String locale;
     private byte[] salt;
-    private double balance;
+    private float balance;
     private Role role;
 
     public User() {
@@ -124,11 +124,11 @@ public class User {
         this.photo = photo;
     }
 
-    public double getBalance() {
+    public float getBalance() {
         return balance;
     }
 
-    public void setBalance(double balance) {
+    public void setBalance(float balance) {
         this.balance = balance;
     }
 
