@@ -41,8 +41,6 @@ public class OrdersServlet extends HttpServlet {
         int startPosition = page * ordersOnPage - ordersOnPage;
         OrderService orderService = new OrderService();
 
-        boolean ordersForUser = true;
-
         List<Order> orders = orderService.getSortedOrders(true, user.getId(), masterId, status, sort, startPosition, ordersOnPage);
 
         //количество страниц с записями
