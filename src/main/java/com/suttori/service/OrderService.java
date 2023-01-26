@@ -1,7 +1,9 @@
 package com.suttori.service;
 
+import com.suttori.dao.CommentDAO;
 import com.suttori.dao.OrderDAO;
 import com.suttori.dao.UserDAO;
+import com.suttori.entity.Comment;
 import com.suttori.entity.Order;
 import com.suttori.entity.enams.OrderStatus;
 import org.apache.log4j.Logger;
@@ -16,6 +18,7 @@ public class OrderService {
 
     private OrderDAO orderDAO = new OrderDAO();
     private UserDAO userDAO = new UserDAO();
+    private CommentDAO commentDAO = new CommentDAO();
 
     private final Logger logger = Logger.getLogger(OrderService.class);
     private EmailSenderService mailSender = new EmailSenderService();
@@ -42,9 +45,6 @@ public class OrderService {
 //    public List<Order> getOrdersAll(int startPosition, int total) {
 //        return orderDAO.findAll(startPosition, total);
 //    }
-
-
-
 
     public boolean saveManagerAnswer(int price, int masterId, int orderId) {
         if (price < 5) {
@@ -102,6 +102,21 @@ public class OrderService {
 
         return orderDAO.findBy(filterParams, sortingParams, limitingParams);
     }
+
+    public boolean saveComment(int orderId, Comment comment) {
+//        if (comment.getRate() <= 0) {
+//            error = "nullRateError";
+//            return false;
+//        }
+        if (comment.getDescription().length() < 2) {
+            error = "descriptionShortError";
+            return false;
+        }
+        commentDAO.insert(comment);
+        orderDAO.setCommentId(orderId, comment);
+        return true;
+    }
+
 
     //забираем количество строк
     public int getNumberOfRows() {

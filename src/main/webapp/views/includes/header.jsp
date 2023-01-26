@@ -22,7 +22,7 @@
 
 
                     <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                        <button class="btn btn-secondary dropdown-toggle" type="button" aria-haspopup="true" data-bs-toggle="dropdown"
                                 aria-expanded="false">
                             <c:out value="${user.balance}"/> UAH
                         </button>
@@ -81,6 +81,9 @@
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="/views/managerPage"> Сторінка
                                 менеджера </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/userList"> Список користувачів </a>
                         </li>
                     </c:if>
                     <c:if test="${user.isCraftsman()}">

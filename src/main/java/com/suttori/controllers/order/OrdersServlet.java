@@ -1,5 +1,6 @@
 package com.suttori.controllers.order;
 
+import com.suttori.entity.Comment;
 import com.suttori.entity.Order;
 import com.suttori.entity.User;
 import com.suttori.entity.enams.OrderStatus;
@@ -55,5 +56,30 @@ public class OrdersServlet extends HttpServlet {
         req.setAttribute("masters", masters);
         RequestDispatcher view = req.getRequestDispatcher("/views/profile/orders.jsp");
         view.forward(req, resp);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        int orderId = Integer.parseInt(req.getParameter("orderId"));
+        int craftsmanId = Integer.parseInt(req.getParameter("craftsmanId"));
+        int userId = Integer.parseInt(req.getParameter("userId"));
+        String description = req.getParameter("description");
+
+        Comment comment = new Comment();
+        comment.setCraftsmanId(craftsmanId);
+        comment.setUserId(userId);
+//        comment.setRate(rate);
+        comment.setDescription(description);
+
+        OrderService orderService = new OrderService();
+        if (orderService.saveComment(orderId, comment)) {
+
+
+            resp.sendRedirect("/profile/orders");
+        }else{
+            req.setAttribute("error", orderService.error);
+            doGet(req, resp);
+        }
     }
 }

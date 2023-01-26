@@ -55,6 +55,10 @@
         <servlet-name>PaymentServlet</servlet-name>
         <servlet-class>com.suttori.controllers.order.PaymentServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>UserListServlet</servlet-name>
+        <servlet-class>com.suttori.controllers.UserListServlet</servlet-class>
+    </servlet>
 
 
 
@@ -101,11 +105,15 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>CraftsmanServlet</servlet-name>
-        <url-pattern>/views/craftsman</url-pattern>
+        <url-pattern>/views/craftsman/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>PaymentServlet</servlet-name>
         <url-pattern>/payment/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UserListServlet</servlet-name>
+        <url-pattern>/userList/*</url-pattern>
     </servlet-mapping>
 
 

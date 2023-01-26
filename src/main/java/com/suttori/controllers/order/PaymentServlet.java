@@ -39,7 +39,6 @@ public class PaymentServlet extends HttpServlet {
         logger.info("doPost");
         User user = (User) req.getSession().getAttribute("user");
         float sum = Integer.parseInt(req.getParameter("sum"));
-        System.out.println(sum);
         PaymentService paymentService = new PaymentService();
         paymentService.topUpBalance(user, sum);
         req.setAttribute("message", "orderPaymentSuccess");

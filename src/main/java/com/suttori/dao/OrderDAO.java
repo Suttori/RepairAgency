@@ -2,6 +2,7 @@ package com.suttori.dao;
 
 import com.suttori.dao.interfaces.ElasticDao;
 import com.suttori.db.ConnectionManager;
+import com.suttori.entity.Comment;
 import com.suttori.entity.Order;
 import com.suttori.entity.enams.OrderStatus;
 
@@ -19,15 +20,15 @@ public class OrderDAO implements ElasticDao<Order> {
 
     @Override
     public boolean insert(Order order) {
-        String addOrder = "INSERT INTO \"order\"(user_id, craftsman_id, order_name, description, price, comment, status, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String addOrder = "INSERT INTO \"order\"(user_id, craftsman_id, order_name, description, comment_id, price, status, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection connection = ConnectionManager.getInstance().getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(addOrder)) {
             preparedStatement.setInt(1, order.getUserId());
             preparedStatement.setInt(2, order.getCraftsmanId());
             preparedStatement.setString(3, order.getOrderName());
             preparedStatement.setString(4, order.getDescription());
-            preparedStatement.setInt(5, order.getPrice());
-            preparedStatement.setString(6, order.getComment());
+            preparedStatement.setInt(5, order.getCommentId());
+            preparedStatement.setInt(6, order.getPrice());
             preparedStatement.setString(7, order.getStatus().name());
             preparedStatement.setDate(8, new Date(order.getDate().getTime()));
             preparedStatement.execute();
@@ -81,7 +82,6 @@ public class OrderDAO implements ElasticDao<Order> {
         }
         return null;
     }
-
 
     @Override
     public List<Order> findAll(int start, int total) {
@@ -221,6 +221,7 @@ public class OrderDAO implements ElasticDao<Order> {
     @Override
     public void setVariable(String variable, int orderId, String value) {
         String set = String.format("UPDATE \"order\" SET %s = ? WHERE id = ?", variable);
+        System.out.println(orderId);
         try (Connection connection = ConnectionManager.getInstance().getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(set)) {
             preparedStatement.setString(1, value);
@@ -257,8 +258,8 @@ public class OrderDAO implements ElasticDao<Order> {
         order.setCraftsmanId(resultSet.getInt("craftsman_id"));
         order.setOrderName(resultSet.getString("order_name"));
         order.setDescription(resultSet.getString("description"));
+        order.setCommentId(resultSet.getInt("comment_id"));
         order.setPrice(resultSet.getInt("price"));
-        order.setComment(resultSet.getString("comment"));
         order.setStatus(OrderStatus.valueOf(resultSet.getString("status")));
         order.setDate(resultSet.getDate("date"));
         return order;
@@ -274,6 +275,10 @@ public class OrderDAO implements ElasticDao<Order> {
 
     public void setMaster(int id, int masterId){
         setVariable("craftsman_id", id, masterId);
+    }
+
+    public void setCommentId(int id, Comment comment){
+        setVariable("comment_id", id, comment.getId());
     }
 
 
@@ -302,6 +307,7 @@ public class OrderDAO implements ElasticDao<Order> {
 
         try (Connection connection = ConnectionManager.getInstance().getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(find)) {
+
             filterParams.values().forEach(value -> { if (value instanceof String) {
                 try {
                     preparedStatement.setString(count.getAndIncrement(), (String) value);

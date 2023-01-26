@@ -1,5 +1,6 @@
 package com.suttori.entity;
 
+import com.suttori.dao.CommentDAO;
 import com.suttori.entity.enams.OrderStatus;
 import com.suttori.service.UserService;
 
@@ -12,7 +13,7 @@ public class Order {
     private int price;
     private int userId;
     private int craftsmanId;
-    private String comment;
+    private int commentId;
     private OrderStatus status = OrderStatus.ACCEPTED;
     private Date date = new Date(System.currentTimeMillis());
 
@@ -64,12 +65,12 @@ public class Order {
         this.craftsmanId = craftsmanId;
     }
 
-    public String getComment() {
-        return comment;
+    public int getCommentId() {
+        return commentId;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setCommentId(int commentId) {
+        this.commentId = commentId;
     }
 
     public OrderStatus getStatus() {
@@ -98,6 +99,12 @@ public class Order {
         return userService.getUserById(userId);
     }
 
+    public String getComment(){
+        CommentDAO commentDao = new CommentDAO();
+        Comment comment = commentDao.findById(commentId);
+        return comment.getDescription();
+    }
+
     public boolean isNew() {
         return status.equals(OrderStatus.ACCEPTED);
     }
@@ -123,6 +130,7 @@ public class Order {
     }
 
 
+
     @Override
     public String toString() {
         return "Order{" +
@@ -132,7 +140,7 @@ public class Order {
                 ", price=" + price +
                 ", personId=" + userId +
                 ", craftsmanId=" + craftsmanId +
-                ", comment=" + comment +
+                ", comment=" + commentId +
                 ", status=" + status +
                 ", date=" + date +
                 '}';

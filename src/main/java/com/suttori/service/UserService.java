@@ -6,8 +6,7 @@ import com.suttori.entity.enams.Role;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
 import java.security.SecureRandom;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class UserService {
     UserDAO userDAO = new UserDAO();
@@ -105,6 +104,25 @@ public class UserService {
         return userDAO.findByRole(Role.CRAFTSMAN);
     }
 
+    public List<User> getSortedUsers(String email, String sort, int startPosition, int totalUsers) {
+        Map<String, Object> filterParams = new HashMap<>();
+        String sortingParams = null;
+        Map<String, Integer> limitingParams = new LinkedHashMap<>();
+
+        if (email != null && !email.isEmpty()) {
+            filterParams.put("email", email);
+        }
+
+        if (sort != null && !sort.equals("none")) {
+            sortingParams = sort;
+        }
+
+        limitingParams.put("LIMIT" , totalUsers);
+        limitingParams.put("OFFSET" , startPosition);
+
+        return userDAO.findBy(filterParams, sortingParams, limitingParams);
+    }
+
     public boolean changePassword(User user, String oldPassword, String newPassword, String newPasswordReaped) {
         if (newPassword.length() > 20) {
             error = "passwordShortError";
@@ -170,5 +188,11 @@ public class UserService {
         random.nextBytes(salt);
         return salt;
     }
+
+
+    public int getNumberOfRows() {
+        return userDAO.totalRows;
+    }
+
 
 }

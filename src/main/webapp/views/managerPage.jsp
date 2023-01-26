@@ -1,10 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: y
-  Date: 18.12.2022
-  Time: 17:17
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -16,7 +9,6 @@
 </head>
 <body>
 <jsp:include page="../views/includes/header.jsp"/>
-
 <div class="container-fluid">
     <div class="row">
         <div class="col-2"></div>
@@ -102,15 +94,24 @@
                     <div class="col">
                         <div class="card h-100">
                             <div class="card-body">
-                                <h5 class="card-title"> Проблема: ${order.orderName}</h5>
+                                <h5 class="card-title"> Проблема: ${order.orderName}
+
+
+                                </h5>
                                 <br>
                                 <h6 class="card-subtitle mb-2"> Статус: ${order.status}</h6>
                                 <br>
+
+
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                         data-bs-target="#exampleModal"
-                                        data-bs-whatever="${order.description}"> Переглянути детальний опис проблеми
+                                        onclick="modal(this)"
+                                        data-bs-whatever="${order.description}">Переглянути детальний опис проблеми
                                 </button>
+
+
                                 <br>
+
                                 <br>
                                 <c:set var="orderUser" value="${order.getUser()}"/>
                                 <h6 class="mt-0"> Замовник: ${orderUser.fullName}</h6>
@@ -155,6 +156,25 @@
                                         <small class="text-muted"> Дата замовлення: ${order.date}</small>
                                     </div>
                                     <div class="col">
+                                    <c:if test="${order.isCompleted() && order.commentId != 0}">
+                                        <div class="d-grid d-md-flex justify-content-md-end">
+
+
+
+
+                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                                    data-bs-target="#exampleModal"
+                                                    onclick="modal(this)"
+                                                    data-bs-whatever="${order.getComment()}"> Відгук
+                                            </button>
+
+
+
+                                        </div>
+                                    </c:if>
+                                    </div>
+
+                                    <div class="col">
                                         <div class="dropdown gap-2 d-md-flex justify-content-md-end">
                                             <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                 Змінити статус
@@ -172,20 +192,6 @@
                                             </ul>
                                         </div>
                                     </div>
-
-<%--                                    <c:if test="${!order.isCanceled() && !order.isCompleted()}">--%>
-<%--                                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">--%>
-<%--                                            <a href="/views/managerPage/cancel?orderId=${order.id}"--%>
-<%--                                               class="btn btn-outline-danger btn-sm float-right"> Скасувати--%>
-<%--                                                замовлення</a>--%>
-<%--                                        </div>--%>
-<%--                                    </c:if>--%>
-
-
-
-
-
-
                                 </div>
                             </div>
                         </div>
@@ -193,7 +199,7 @@
                 </c:forEach>
             </div>
             <br>
-            <jsp:include page="../views/includes/paginationManager.jsp"/>
+            <jsp:include page="../views/includes/pagination.jsp"/>
         </div>
     </div>
 </div>
@@ -208,7 +214,6 @@
             <div class="modal-body">
                 <div class="mb-xxl">
                     <textarea class="form-control" id="recipient-name" rows="10"></textarea>
-
                 </div>
             </div>
             <div class="modal-footer">
@@ -217,23 +222,18 @@
         </div>
     </div>
 </div>
-<script>
-    const exampleModal = document.getElementById('exampleModal')
-    if (exampleModal) {
-        exampleModal.addEventListener('show.bs.modal', event => {
-            // Button that triggered the modal
-            const button = event.relatedTarget
-            // Extract info from data-bs-* attributes
-            const recipient = button.getAttribute('data-bs-whatever')
-            // Update the modal's content.
-            const modalTitle = exampleModal.querySelector('.modal-title')
-            const modalBodyInput = exampleModal.querySelector('.modal-body textarea')
 
-            modalTitle.textContent = `Детальний опис проблеми ${recipient}`
-            modalBodyInput.value = recipient
-        })
+<script>
+    function modal(element) {
+        const recipient = element.getAttribute('data-bs-whatever')
+        const exampleModal = document.getElementById('exampleModal')
+        const modalTitle = exampleModal.querySelector('.modal-title')
+        const modalBodyInput = exampleModal.querySelector('.modal-body textarea')
+        modalTitle.textContent = `Детальний опис проблеми ${recipient}`
+        modalBodyInput.value = recipient
     }
 </script>
+
 <%--<jsp:include page="../includes/footer.jsp"/>--%>
 </body>
 </html>

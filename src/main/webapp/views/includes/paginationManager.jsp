@@ -11,7 +11,7 @@
     <ul class="pagination justify-content-center">
         <c:if test="${page != 1}">
             <li class="page-item">
-                <a class="page-link" href="managerPage?page=${page-1}"> Попередня </a>
+                <a class="page-link" onclick="addUrlParameter('${page-1}')"> Попередня </a>
             </li>
         </c:if>
 
@@ -23,14 +23,14 @@
                     </li>
                 </c:when>
                 <c:otherwise>
-                    <li class="page-item"><a class="page-link" href="managerPage?page=${i}">${i}</a>
+                    <li class="page-item"><a class="page-link" onclick="addUrlParameter('${i}')">${i}</a>
                     </li>
                 </c:otherwise>
             </c:choose>
         </c:forEach>
 
         <c:if test="${page lt nOfPages}">
-            <li class="page-item"><a class="page-link" href="managerPage?page=${page+1}"> Наступна </a>
+            <li class="page-item"><a class="page-link" onclick="addUrlParameter('${page+1}')"> Наступна </a>
             </li>
         </c:if>
     </ul>

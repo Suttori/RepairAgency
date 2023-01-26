@@ -9,6 +9,10 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page isELIgnored="false" %>
+<c:set value='${sessionScope["user"]}' var="user"/>
+
+<fmt:setLocale value="${sessionScope.lang}"/>
+<fmt:setBundle basename="resources"/>
 <!DOCTYPE html>
 <html lang="En">
 <head>
@@ -132,6 +136,26 @@
                                 </c:if>
 
 
+                                <c:if test="${order.isCompleted() && order.commentId <= 0}">
+                                    <form action="/profile/orders" method="post">
+                                        <input type="hidden" name="orderId" value="${order.id}">
+                                        <input type="hidden" name="craftsmanId" value="${order.craftsmanId}">
+                                        <input type="hidden" name="userId" value="${order.userId}">
+
+                                        <label for="textarea">Залишити відгук</label>
+
+                                        <br>
+                                        <div class="form-group">
+                                            <small class="form-text text-muted"> Якщо не бажаєте надсилати відгук, залиште це поле пустим </small>
+                                            <textarea class="form-control"  id="textarea"
+                                                      name="description"></textarea>
+                                        </div>
+                                        <br>
+                                        <button type="submit" class="btn btn-primary"> Підтвердити </button>
+                                    </form>
+
+                                </c:if>
+
                             </div>
 
                             <div class="card-footer">
@@ -140,6 +164,7 @@
                                         <small class="text-muted"> Дата замовлення: ${order.date}</small>
                                     </div>
                                     <div class="col">
+
                                         <c:if test="${!order.isCanceled() && !order.isCompleted()}">
                                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                                 <a href="/profile/orders/cancel?orderId=${order.id}"
@@ -147,6 +172,8 @@
                                                     замовлення</a>
                                             </div>
                                         </c:if>
+
+
                                     </div>
                                 </div>
                             </div>

@@ -14,9 +14,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static java.util.stream.Collectors.joining;
 
 public class UserDAO implements ElasticDao<User> {
     private final Logger logger = Logger.getLogger(UserDAO.class);
+    public int totalRows;
 
     @Override
     public boolean insert(User user) {
@@ -45,10 +49,73 @@ public class UserDAO implements ElasticDao<User> {
         }
     }
 
+
     @Override
     public List<User> findBy(Map<String, Object> filterParams, String sortingParams, Map<String, Integer> limitingParams) {
+
+        AtomicInteger count = new AtomicInteger(1);
+        StringBuilder stringBuilder = new StringBuilder();
+        List<User> users = new ArrayList<>();
+
+        if (!filterParams.isEmpty()) {
+            stringBuilder.append("WHERE ");
+            stringBuilder.append(filterParams.keySet().stream().map(k -> k + " = ?").collect(joining( " AND ")));
+        }
+
+        if (sortingParams != null) {
+            stringBuilder.append(" ORDER BY ").append(sortingParams);
+        }
+
+        if (!limitingParams.isEmpty()) {
+            stringBuilder.append(" LIMIT ? OFFSET ?");
+        }
+
+        String find = String.format("SELECT *, count(*) OVER() AS total_count FROM \"user\" %s;", stringBuilder);
+        System.out.println(find);
+        try (Connection connection = ConnectionManager.getInstance().getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(find)) {
+
+            filterParams.values().forEach(value -> { if (value instanceof String) {
+                try {
+                    preparedStatement.setString(count.getAndIncrement(), (String) value);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+                if (value instanceof Integer) {
+                    try {
+                        preparedStatement.setInt(count.getAndIncrement(), (int) value);
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+
+            limitingParams.values().forEach(value -> {
+                try {
+                    preparedStatement.setInt(count.getAndIncrement(), value);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                totalRows = resultSet.getInt("total_count");
+                users.add(buildObjectFromResultSet(resultSet));
+
+            }
+            resultSet.close();
+            return users;
+        } catch (SQLException throwable) {
+            throwable.printStackTrace();
+        }
         return null;
     }
+
+
+
+
 
     @Override
     public User findBy(String byName, int value) {
@@ -164,7 +231,7 @@ public class UserDAO implements ElasticDao<User> {
         user.setEmailActivated(resultSet.getString("email_activated"));
         user.setLocale(resultSet.getString("locale"));
         user.setSalt(resultSet.getBytes("salt"));
-        user.setRole(Role.valueOf(resultSet.getString("role")));
+        user.setRole(Role.valueOf(resultSet.getString("role").toUpperCase()));
         return user;
     }
 

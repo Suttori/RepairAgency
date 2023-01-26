@@ -23,28 +23,10 @@
         <div class="col-10">
 
 
-            <form method="get" action="/views/managerPage" class="form-inline">
+            <form method="get" action="/views/craftsman" class="form-inline">
                 <div class="row justify-content-evenly">
 
-                    <div class="col-3">
-                        <select name="master" class="form-control">
-                            <c:choose>
-                                <c:when test="${param['master'] != null && param['master'] != -1}">
-                                    <option selected hidden value="${param["master"]}">
-                                        Майстер
-                                    </option>
-                                    <option value="-1"> Майстер не призначений</option>
-                                </c:when>
-                                <c:otherwise>
-                                    <option value="-1" selected> Всі майстри </option>
-                                </c:otherwise>
-                            </c:choose>
-                            <c:forEach var="master" items="${masters}">
-                                <option value="${master.id}">${master.fullName}
-                                    , ${master.email}</option>
-                            </c:forEach>
-                        </select>
-                    </div>
+
                     <div class="col-3">
                         <select name="status" class="form-control ml-2">
                             <option value="ALL"> Всі</option>
@@ -53,20 +35,19 @@
                                     <option selected hidden value="${param['status']}">
                                         <fmt:message key="${param['status']}"/>
                                     </option>
-                                    <option value="ACCEPTED">ACCEPTED</option>
+                                    <option value="PAID">PAID</option>
                                 </c:when>
                                 <c:otherwise>
-                                    <option value="ACCEPTED" selected>ACCEPTED</option>
+                                    <option value="PAID" selected>PAID</option>
                                 </c:otherwise>
                             </c:choose>
-                            <option value="PENDING_PAYMENT">PENDING_PAYMENT</option>
                             <option value="PAID">PAID</option>
-                            <option value="CANCELED">CANCELED</option>
                             <option value="IN_PROGRESS">IN_PROGRESS</option>
                             <option value="COMPLETED">COMPLETED</option>
                         </select>
                     </div>
                     <div class="col-3">
+
                         <select name="sort" class="form-control ml-2">
                             <c:choose>
                                 <c:when test="${param['sort'] != null}">
@@ -79,6 +60,7 @@
                                     <option value="none" selected> Без сортування</option>
                                 </c:otherwise>
                             </c:choose>
+
                             <option value="date ASC">date ASC</option>
                             <option value="date DESC">date DESC</option>
                             <option value="price ASC">price ASC</option>
@@ -86,7 +68,10 @@
                         </select>
                     </div>
                     <div class="col-3">
-                        <button type="submit" class="btn btn-primary ml-2"> Пошук </button>
+                        <button type="submit" class="btn btn-primary ml-2"> Пошук</button>
+                    </div>
+                    <div class="col-3">
+
                     </div>
 
 
@@ -115,47 +100,47 @@
                                 <br>
                                 <c:if test="${order.craftsmanId > 0}">
                                     <c:set var="orderCraftsman" value="${order.getCraftsman()}"/>
-                                    <h6 class="card-subtitle mb-2"> Майстер: ${orderCraftsman.id} ${orderCraftsman.getFullName()} </h6>
+                                    <h6 class="card-subtitle mb-2">
+                                        Майстер: ${orderCraftsman.id} ${orderCraftsman.getFullName()} </h6>
                                 </c:if>
                                 <c:if test="${order.price > 0}">
                                     <br>
                                     <h6 class="card-subtitle mb-2"> Вартість послуги: ${order.price}</h6>
                                 </c:if>
 
-                                <c:if test="${order.isNew()}">
-                                    <div class="dropdown-divider"></div>
-                                    <form action="/views/managerPage" method="post">
-                                        <input type="hidden" name="orderId" value="${order.id}">
-                                        <div class="form-group">
-                                            <h6 class="card-subtitle mb-2"> Призначити майстра: </h6>
-
-                                            <select required name="selectedMaster" class="form-control">
-                                                <c:forEach var="master" items="${masters}">
-                                                    <option value="${master.id}">${master.fullName}
-                                                        , ${master.email}</option>
-                                                </c:forEach>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Вартість послуги: </label>
-                                            <input required type="number" name="price" class="form-control">
-                                        </div>
-                                        <button type="submit" class="btn btn-primary">Призначити</button>
-                                    </form>
-                                </c:if>
-
                             </div>
 
 
                             <div class="card-footer">
-                                <small class="text-muted"> Дата замовлення: ${order.date}</small>
+                                <div class="row">
+                                    <div class="col">
+                                        <small class="text-muted"> Дата замовлення: ${order.date}</small>
+                                    </div>
+                                    <div class="col">
+                                        <c:if test="${!order.isCompleted() && !order.isPendingPayment()}">
+                                        <div class="dropdown gap-2 d-md-flex justify-content-md-end">
+                                            <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Змінити статус
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <c:if test="${order.isPaid()}">
+                                                    <li><a class="dropdown-item" href="/views/craftsman/execute?orderId=${order.id}"> Взяти в роботу</a></li>
+                                                </c:if>
+                                                <c:if test="${order.isInProgress()}">
+                                                    <li><a class="dropdown-item" href="/views/craftsman/complete?orderId=${order.id}"> Замовлення виконано </a></li>
+                                                </c:if>
+                                            </ul>
+                                        </div>
+                                        </c:if>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </c:forEach>
             </div>
             <br>
-            <jsp:include page="../views/includes/paginationManager.jsp"/>
+            <jsp:include page="../views/includes/pagination.jsp"/>
         </div>
     </div>
 </div>
@@ -170,7 +155,6 @@
             <div class="modal-body">
                 <div class="mb-xxl">
                     <textarea class="form-control" id="recipient-name" rows="10"></textarea>
-
                 </div>
             </div>
             <div class="modal-footer">
@@ -179,6 +163,8 @@
         </div>
     </div>
 </div>
+
+
 <script>
     const exampleModal = document.getElementById('exampleModal')
     if (exampleModal) {
