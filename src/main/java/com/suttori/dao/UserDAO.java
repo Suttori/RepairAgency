@@ -4,6 +4,7 @@ import com.suttori.dao.interfaces.ElasticDao;
 import com.suttori.db.ConnectionManager;
 import com.suttori.entity.Order;
 import com.suttori.entity.User;
+import com.suttori.entity.enams.Locales;
 import com.suttori.entity.enams.Role;
 import org.apache.log4j.Logger;
 
@@ -229,7 +230,7 @@ public class UserDAO implements ElasticDao<User> {
         user.setPhoto(resultSet.getString("photo"));
         user.setActivationCode(resultSet.getString("activation_code"));
         user.setEmailActivated(resultSet.getString("email_activated"));
-        user.setLocale(resultSet.getString("locale"));
+        user.setLocale(Locales.valueOf(resultSet.getString("locale")));
         user.setSalt(resultSet.getBytes("salt"));
         user.setRole(Role.valueOf(resultSet.getString("role").toUpperCase()));
         return user;
@@ -256,7 +257,9 @@ public class UserDAO implements ElasticDao<User> {
         setVariable("balance", userId, balance);
     }
 
-
+    public void setLocale(User user) {
+        setVariable("locale", user.getId(), user.getLocale());
+    }
 
 
 

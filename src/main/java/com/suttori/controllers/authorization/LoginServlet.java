@@ -49,15 +49,14 @@ public class LoginServlet extends HttpServlet {
             User user = userService.getUserByEmail(email);
             HttpSession session = req.getSession();
             session.setAttribute("user", user);
-            //локализация
-            //remember me
+            session.setAttribute("lang", user.getLocale());
 
             Cookie cookie = new Cookie("RepairAgencyCookie", String.valueOf(user.getId()));
             if (remember) {
                 cookie.setMaxAge(60 * 60 * 24 * 30); //30 days
             }
             resp.addCookie(cookie);
-            resp.sendRedirect("/views/profile.jsp");
+            resp.sendRedirect("/profile/orders");
         } else {
             req.setAttribute("error", userService.error);
             doGet(req, resp);

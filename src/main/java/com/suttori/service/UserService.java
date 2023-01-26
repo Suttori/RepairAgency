@@ -2,6 +2,7 @@ package com.suttori.service;
 
 import com.suttori.dao.UserDAO;
 import com.suttori.entity.User;
+import com.suttori.entity.enams.Locales;
 import com.suttori.entity.enams.Role;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
@@ -180,6 +181,11 @@ public class UserService {
             error = "phoneNumberSame";
         }
         return true;
+    }
+
+    public void setLocale(User user, Locales locales) {
+        user.setLocale(locales);
+        userDAO.setLocale(user);
     }
 
     public byte[] generateSalt() {

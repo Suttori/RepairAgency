@@ -1,6 +1,7 @@
 package com.suttori.controllers.authorization;
 
 import com.suttori.entity.User;
+import com.suttori.entity.enams.Locales;
 import org.apache.log4j.Logger;
 import com.suttori.service.UserService;
 
@@ -39,8 +40,7 @@ public class RegistrationServlet extends HttpServlet {
         user.setEmail(req.getParameter("email"));
         user.setPhoneNumber(req.getParameter("phoneNumber"));
         user.setPassword(req.getParameter("password"));
-        //Локализация
-        user.setLocale("Locale");
+        user.setLocale(Locales.valueOf((String) req.getSession().getAttribute("lang")));
         if (userService.save(user)) {
             HttpSession session = req.getSession();
             session.setAttribute("user", user);

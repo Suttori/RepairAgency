@@ -27,7 +27,7 @@ public class ProjectProperties {
         try (InputStream resource = ProjectProperties.class.getClassLoader().getResourceAsStream(fileName)) {
             props.load(resource);
         } catch (IOException exception) {
-            System.out.println("---------------------------- smth wrong with property file");
+            System.out.println("smth wrong with property file");
             exception.printStackTrace();
         }
         return props;

@@ -1,5 +1,6 @@
 package com.suttori.entity;
 
+import com.suttori.entity.enams.Locales;
 import com.suttori.entity.enams.Role;
 
 import javax.crypto.SecretKeyFactory;
@@ -7,8 +8,6 @@ import javax.crypto.spec.PBEKeySpec;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
-import java.util.ArrayList;
-import java.util.List;
 
 public class User {
     private int id;
@@ -20,7 +19,7 @@ public class User {
     private String photo;
     private String activationCode;
     private String emailActivated;
-    private String locale;
+    private Locales locale;
     private byte[] salt;
     private float balance;
     private Role role;
@@ -53,10 +52,10 @@ public class User {
     }
 
     public String getLocale() {
-        return locale;
+        return locale.name();
     }
 
-    public void setLocale(String locale) {
+    public void setLocale(Locales locale) {
         this.locale = locale;
     }
 

@@ -3,18 +3,25 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page isELIgnored="false" %>
 <!doctype html>
-<html lang="en">
+
+
+<fmt:setLocale value="${sessionScope.lang}" scope="session"/>
+<fmt:setBundle basename="resources"/>
+
+
 <head>
+
+    <title></title>
     <jsp:include page="../includes/links.jsp"/>
-    <title>Bootstrap Example</title>
     <c:set var="user" value='${sessionScope["user"]}'/>
-    <fmt:setLocale value="${sessionScope.lang}"/>
+
+
 </head>
 
 <body class="p-3 m-0 border-0 bd-example">
 <nav class="navbar navbar-dark bg-dark fixed-top">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/views/profile.jsp"> Ремонтна Агенція "Назва"</a>
+        <a class="navbar-brand" href="/views/profile.jsp"> <fmt:message key="logo"/></a>
 
         <div class="container">
             <ul class="nav justify-content-end">
@@ -22,16 +29,18 @@
 
 
                     <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" aria-haspopup="true" data-bs-toggle="dropdown"
+                        <button class="btn btn-secondary dropdown-toggle" type="button" aria-haspopup="true"
+                                data-bs-toggle="dropdown"
                                 aria-expanded="false">
                             <c:out value="${user.balance}"/> UAH
                         </button>
                         <form class="dropdown-menu p-3" action="/payment" method="post">
-                            <div class="mb-3" >
-                                <label for="sum" class="form-label"> Поповнення рахунку </label>
-                                <input type="text" class="form-control" name="sum" id="sum" placeholder="Введіть суму">
+                            <div class="mb-3">
+                                <label for="sum" class="form-label"> <fmt:message key="header.topUpBalance"/></label>
+                                <input type="text" class="form-control" name="sum" id="sum"
+                                       placeholder="<fmt:message key="header.enterSum"/>">
                             </div>
-                            <button type="submit" class="btn btn-primary"> Поповнити </button>
+                            <button type="submit" class="btn btn-primary"><fmt:message key="header.replenish"/></button>
                         </form>
                     </div>
                 </li>
@@ -42,12 +51,11 @@
                     <div class="dropdown">
                         <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
                                 aria-expanded="false">
-                            <%--                            <c:out value="${sessionScope.lang}"/>--%>
-                            Lang
+                            <c:out value="${sessionScope.lang}"/>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="?lang=En">En</a></li>
-                            <li><a class="dropdown-item" href="?lang=Ua">Ua</a></li>
+                            <li><a class="dropdown-item" href="?lang=En"><fmt:message key="header.en"/></a></li>
+                            <li><a class="dropdown-item" href="?lang=Ua"><fmt:message key="header.ua"/></a></li>
                         </ul>
                     </div>
                 </li>
@@ -57,8 +65,6 @@
                 aria-controls="offcanvasDarkNavbar">
             <span class="navbar-toggler-icon"></span>
         </button>
-
-
         <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar"
              aria-labelledby="offcanvasDarkNavbarLabel">
             <div class="offcanvas-header">
@@ -76,6 +82,9 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="/profile/addOrder"> Додати замовлення </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/profile/orders"> Мої замовлення </a>
                     </li>
                     <c:if test="${user.isManager()}">
                         <li class="nav-item">

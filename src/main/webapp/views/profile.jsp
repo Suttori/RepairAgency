@@ -1,12 +1,21 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="C" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page isELIgnored="false"%>
+
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
+<fmt:setLocale value="${sessionScope.lang}" scope="session"/>
+<fmt:setBundle basename="resources"/>
 
 <html>
 <body>
 <jsp:include page="../views/includes/header.jsp"/>
+
+
+
+<p>${sessionScope.lang}</p>
+<fmt:message key="logo"/>
 
 <form>Головна сторінка</form>
 
