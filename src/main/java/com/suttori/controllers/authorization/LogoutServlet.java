@@ -8,14 +8,15 @@ import javax.servlet.http.*;
 import java.io.IOException;
 
 
-
+/**
+ * servlet clears cookies, session and logout
+ */
 @WebServlet(name = "logout")
 public class LogoutServlet extends HttpServlet {
 
     private final Logger logger = Logger.getLogger(LogoutServlet.class);
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        logger.info("do get");
         HttpSession session = req.getSession(false);
         if (session != null) {
             Cookie cookie = new Cookie("RepairAgencyCookie", "");

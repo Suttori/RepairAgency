@@ -20,10 +20,6 @@
         <servlet-class>com.suttori.controllers.authorization.RegistrationServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ProfileServlet</servlet-name>
-        <servlet-class>com.suttori.controllers.user.ProfileServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>ProfileEditServlet</servlet-name>
         <servlet-class>com.suttori.controllers.user.ProfileEditServlet</servlet-class>
     </servlet>
@@ -36,8 +32,8 @@
         <servlet-class>com.suttori.controllers.authorization.EmailSenderServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>OrderServlet</servlet-name>
-        <servlet-class>com.suttori.controllers.order.OrderServlet</servlet-class>
+        <servlet-name>AddOrderServlet</servlet-name>
+        <servlet-class>com.suttori.controllers.order.AddOrderServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>OrdersServlet</servlet-name>
@@ -76,10 +72,6 @@
         <url-pattern>/registration</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ProfileServlet</servlet-name>
-        <url-pattern>/profile/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>ProfileEditServlet</servlet-name>
         <url-pattern>/profile/edit/*</url-pattern>
     </servlet-mapping>
@@ -92,7 +84,7 @@
         <url-pattern>/activate/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>OrderServlet</servlet-name>
+        <servlet-name>AddOrderServlet</servlet-name>
         <url-pattern>/profile/addOrder</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -116,7 +108,15 @@
         <url-pattern>/userList/*</url-pattern>
     </servlet-mapping>
 
+    <filter>
+        <filter-name>EncodingFilter</filter-name>
+        <filter-class>com.suttori.filter.EncodingFilter</filter-class>
+    </filter>
 
+    <filter-mapping>
+        <filter-name>EncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 
     <jsp-config>
         <jsp-property-group>
@@ -124,6 +124,8 @@
             <page-encoding>UTF-8</page-encoding>
         </jsp-property-group>
     </jsp-config>
+
+
 
 
 </web-app>

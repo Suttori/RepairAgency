@@ -12,7 +12,10 @@ import java.io.IOException;
 
 @WebFilter(filterName = "LocaleFilter", urlPatterns = {"/*"})
 public class LocaleFilter implements Filter {
-    private static final Logger log = Logger.getLogger(LocaleFilter.class);
+
+    private static final Logger logger = Logger.getLogger(LocaleFilter.class);
+
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
@@ -24,7 +27,7 @@ public class LocaleFilter implements Filter {
             if(Locales.contains(req.getParameter("lang"))) {
                 req.getSession().setAttribute("lang", req.getParameter("lang"));
                 if (user != null){
-                    log.info("save user language");
+                    logger.info("Save user language");
                     UserService userService = new UserService();
                     userService.setLocale(user, Locales.valueOf(locale));
                 }
@@ -37,10 +40,14 @@ public class LocaleFilter implements Filter {
         chain.doFilter(request, response);
     }
 
+    @Override
     public void destroy() {
+        logger.info( "The filter: {} has finished its work");
     }
 
+    @Override
     public void init(FilterConfig arg0) {
+        logger.info( "The filter: {} has begun its work");
     }
 }
 

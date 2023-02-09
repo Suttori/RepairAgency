@@ -8,21 +8,19 @@
 
 <fmt:setLocale value="${sessionScope.lang}"/>
 <fmt:setBundle basename="resources"/>
-
 <html>
 <head>
-    <title></title>
+    <title><fmt:message key="header.userList"/></title>
 </head>
 <body>
 <jsp:include page="../views/includes/header.jsp"/>
 
 <div class="container mt-5">
-
     <form method="get" action="/userList" class="form-inline">
         <div class="row justify-content-evenly">
             <div class="col-4">
                 <input type="email" name="email" class="form-control"
-                       placeholder="Введіть email">
+                       placeholder="<fmt:message key="search.byEmail"/>">
             </div>
 
             <div class="col-4">
@@ -32,22 +30,21 @@
                             <option selected hidden value="${param['sort']}">
                                 <fmt:message key="${param['sort']}"/>
                             </option>
-                            <option value="none"> none</option>
+                            <option value="none"><fmt:message key="none"/></option>
                         </c:when>
                         <c:otherwise>
-                            <option value="none" selected>none</option>
+                            <option value="none" selected><fmt:message key="none"/></option>
                         </c:otherwise>
                     </c:choose>
-                    <option value="date ASC">date ASC</option>
-                    <option value="date DESC">date DESC</option>
-                    <option value="price ASC">price ASC</option>
-                    <option value="price DESC">price DESC</option>
+                    <option value="first_name ASC"><fmt:message key="name ASC"/></option>
+                    <option value="first_name DESC"><fmt:message key="name DESC"/></option>
+                    <option value="balance ASC"><fmt:message key="balance ASC"/></option>
+                    <option value="balance DESC"><fmt:message key="balance DESC"/></option>
                 </select>
             </div>
             <div class="col-4">
-                <button type="submit" class="btn btn-primary ml-2"> Пошук</button>
+                <button type="submit" class="btn btn-primary ml-2"><fmt:message key="search"/></button>
             </div>
-
         </div>
     </form>
     <ul class="list-group">
@@ -57,7 +54,6 @@
                     <li class="list-group-item ">
                         <div class="media">
                             <div class="media-body">
-
                                 <div class="row justify-content-evenly">
                                     <div class="col-10">
                                         <div class="ms-2 me-auto">
@@ -65,65 +61,64 @@
                                                     ${user.fullName}
                                             </div>
                                                 ${user.id}
-                                            Емейл: ${user.email} <br>
-                                            Роль: ${user.role} <br>
-                                            Баланс: ${user.balance} UAH
+                                            <fmt:message key="user.email"/>: ${user.email} <br>
+                                            <fmt:message key="user.status"/>: ${user.role} <br>
+                                            <fmt:message key="user.balance"/>: ${user.balance} UAH
                                         </div>
                                     </div>
                                     <div class="col-2">
-
+                                        <c:if test="${!user.isManager()}">
                                         <button type="button" class="btn btn-primary d-flex justify-content-end"
                                                 data-bs-toggle="modal"
-                                                data-bs-target="#exampleModal${user.id}"> Поповнити баланс
+                                                data-bs-target="#exampleModal${user.id}"><fmt:message
+                                                key="user.topUpBalance"/>
                                         </button>
-
-
+                                        </c:if>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </li>
 
-
-                    <!-- Модальное окно -->
-                    <div class="modal fade" id="exampleModal${user.id}" tabindex="-1" aria-labelledby="exampleModalLabel"
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModal${user.id}" tabindex="-1"
+                         aria-labelledby="exampleModalLabel"
                          aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h1 class="modal-title fs-5" id="exampleModalLabel"></h1>
+                                    <h1 class="modal-title fs-5" id="exampleModalLabel">
+                                        <fmt:message key="user.topUpBalanceHead"/>
+                                    </h1>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Закрити"></button>
+                                            aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
                                     <form method="post" action="/userList">
                                         <input type="hidden" name="userId" value="${user.id}">
-                                        <p>${user.id}</p>
+                                        <fmt:message key="users.sure"/>
                                         <div class="input-wrapper">
-                                            <input class="form-control input-with-icon" type="number" placeholder="Sum"
+                                            <input class="form-control input-with-icon" type="number"
                                                    name="sum">
                                             <label class="fa fa-dollar input-icon"></label>
-                                        </div>
-                                        <hr>
-                                        <div class="modal-footer justify-content-center">
-                                            <button type="submit" class="btn btn-primary"> Поповнити</button>
+                                            <br>
+                                            <br>
+                                            <button type="submit" class="btn btn-primary d-flex justify-content-end">
+                                                <fmt:message key="user.submit"/></button>
                                         </div>
                                     </form>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-
                 </c:forEach>
             </c:when>
             <c:otherwise>
                 <div class="alert alert-info" role="alert">
-                    Користувачів не знайдено
+                    <fmt:message key="user.noUsers"/>
                 </div>
             </c:otherwise>
         </c:choose>
-
     </ul>
     <br>
 </div>

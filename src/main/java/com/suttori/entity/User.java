@@ -16,7 +16,6 @@ public class User {
     private String email;
     private String password;
     private String phoneNumber;
-    private String photo;
     private String activationCode;
     private String emailActivated;
     private Locales locale;
@@ -115,14 +114,6 @@ public class User {
         this.password = password;
     }
 
-    public String getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(String photo) {
-        this.photo = photo;
-    }
-
     public float getBalance() {
         return balance;
     }
@@ -163,7 +154,6 @@ public class User {
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
-                ", photo='" + photo + '\'' +
                 ", balance=" + balance +
                 ", role=" + role +
                 '}';

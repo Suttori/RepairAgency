@@ -21,27 +21,28 @@
 <body class="p-3 m-0 border-0 bd-example">
 <nav class="navbar navbar-dark bg-dark fixed-top">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/views/profile.jsp"> <fmt:message key="logo"/></a>
+        <a class="navbar-brand" href="/profile/orders"> <fmt:message key="logo"/></a>
 
         <div class="container">
             <ul class="nav justify-content-end">
                 <li class="nav-item">
-
-
                     <div class="dropdown">
                         <button class="btn btn-secondary dropdown-toggle" type="button" aria-haspopup="true"
                                 data-bs-toggle="dropdown"
                                 aria-expanded="false">
                             <c:out value="${user.balance}"/> UAH
                         </button>
-                        <form class="dropdown-menu p-3" action="/payment" method="post">
-                            <div class="mb-3">
+
+                        <form class="dropdown-menu p-2" action="/payment" method="post">
+                            <div class="mb-4">
                                 <label for="sum" class="form-label"> <fmt:message key="header.topUpBalance"/></label>
-                                <input type="text" class="form-control" name="sum" id="sum"
+
+                                <input type="number" class="form-control" name="sum" id="sum"
                                        placeholder="<fmt:message key="header.enterSum"/>">
                             </div>
                             <button type="submit" class="btn btn-primary"><fmt:message key="header.replenish"/></button>
                         </form>
+
                     </div>
                 </li>
                 <li>
@@ -68,41 +69,36 @@
         <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar"
              aria-labelledby="offcanvasDarkNavbarLabel">
             <div class="offcanvas-header">
-                <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel"> Головне меню </h5>
+                <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel"> <fmt:message key="header.mainMenu"/> </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
                         aria-label="Close"></button>
             </div>
             <div class="offcanvas-body">
                 <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/views/profile.jsp"> Головна </a>
+                        <a class="nav-link active" aria-current="page" href="/profile/edit"> <fmt:message key="header.editProfile"/></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/profile/editData"> Редагувати профіль </a>
+                        <a class="nav-link active" aria-current="page" href="/profile/addOrder"> <fmt:message key="header.addOrder"/> </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/profile/addOrder"> Додати замовлення </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/profile/orders"> Мої замовлення </a>
+                        <a class="nav-link active" aria-current="page" href="/profile/orders"> <fmt:message key="header.myOrders"/> </a>
                     </li>
                     <c:if test="${user.isManager()}">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/views/managerPage"> Сторінка
-                                менеджера </a>
+                            <a class="nav-link active" aria-current="page" href="/views/managerPage"> <fmt:message key="header.managerPage"/> </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/userList"> Список користувачів </a>
+                            <a class="nav-link active" aria-current="page" href="/userList"> <fmt:message key="header.userList"/> </a>
                         </li>
                     </c:if>
                     <c:if test="${user.isCraftsman()}">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/views/craftsman"> Сторінка
-                                майстра </a>
+                            <a class="nav-link active" aria-current="page" href="/views/craftsman"> <fmt:message key="header.craftsmanPage"/> </a>
                         </li>
                     </c:if>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/profile/logout"> Вихід </a>
+                        <a class="nav-link active" aria-current="page" href="/profile/logout"> <fmt:message key="header.exit"/> </a>
                     </li>
                 </ul>
             </div>

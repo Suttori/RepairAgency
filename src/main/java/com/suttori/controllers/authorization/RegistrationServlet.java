@@ -1,5 +1,6 @@
 package com.suttori.controllers.authorization;
 
+import com.suttori.ProjectProperties;
 import com.suttori.entity.User;
 import com.suttori.entity.enams.Locales;
 import org.apache.log4j.Logger;
@@ -13,7 +14,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
+/**
+ * the servlet processes the input data and passes it to the service
+ * for further user registration
+ */
 @WebServlet(name = "registration")
 public class RegistrationServlet extends HttpServlet {
 
@@ -21,18 +30,17 @@ public class RegistrationServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        log.info("doGet working");
-//        if (req.getSession().getAttribute("user") != null) {
-//            resp.sendRedirect(req.getContextPath() + "/");
-//            return;
-//        }
-        RequestDispatcher view = req.getRequestDispatcher("/views/authorization/registration.jsp");
-        view.forward(req, resp);
+        req.getRequestDispatcher("/views/registration/registration.jsp").forward(req, resp);
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        log.info("doPost working");
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+        if (!isCaptchaFill(req.getParameter("g-recaptcha-response"))) {
+            req.setAttribute("error", "captchaError");
+            doGet(req, resp);
+            return;
+        }
+
         UserService userService = new UserService();
         User user = new User();
         user.setFirstName(req.getParameter("firstName"));
@@ -44,10 +52,29 @@ public class RegistrationServlet extends HttpServlet {
         if (userService.save(user)) {
             HttpSession session = req.getSession();
             session.setAttribute("user", user);
-            resp.sendRedirect("/views/authorization/registrationSuccessful.jsp");
+            resp.sendRedirect("/views/registration/registrationSuccessful.jsp");
             log.info("Registration successful");
         } else {
-            log.info("doPost not work");
+            req.setAttribute("error", userService.error);
+            doGet(req, resp);
         }
+    }
+
+    public static boolean isCaptchaFill(String recaptchaResponse) {
+        String googleCaptcha = "https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s";
+        try {
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(String.format(googleCaptcha, ProjectProperties.getProperty("recaptcha.secret"), recaptchaResponse)))
+                    .build();
+
+            HttpResponse<String> response = client.send(request,
+                    HttpResponse.BodyHandlers.ofString());
+
+            return response.body().split(": ")[1].split(",")[0].equals("true");
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

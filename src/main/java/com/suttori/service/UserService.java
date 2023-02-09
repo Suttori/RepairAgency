@@ -1,11 +1,14 @@
 package com.suttori.service;
 
 import com.suttori.dao.UserDAO;
+import com.suttori.entity.Pagination;
+import com.suttori.entity.Sort;
 import com.suttori.entity.User;
 import com.suttori.entity.enams.Locales;
 import com.suttori.entity.enams.Role;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
+
 import java.security.SecureRandom;
 import java.util.*;
 
@@ -13,27 +16,37 @@ public class UserService {
     UserDAO userDAO = new UserDAO();
     public String error;
     EmailSenderService emailSenderService = new EmailSenderService();
-    private final Logger log = Logger.getLogger(UserService.class);
+    private final Logger logger = Logger.getLogger(UserService.class);
+    final String PHONE_TEMPLATE = "^380\\d{3}\\d{2}\\d{2}\\d{2}$";
 
     public boolean save(User user) {
         User userFromDB = getUserByEmail(user.getEmail());
-        if(userFromDB != null) {
-            log.info("user already register");
+
+        if (userFromDB != null) {
+            logger.info("user already register");
             error = "emailAlreadyUse";
             return false;
         }
         if (user.getFirstName().length() < 3) {
+            logger.info("shortFirstNameError");
             error = "shortFirstNameError";
             return false;
         }
         if (user.getLastName().length() < 3) {
+            logger.info("lastNameShortError");
             error = "lastNameShortError";
             return false;
         }
-//        if (user.getPassword().length() < 5) {
-//            error = "passwordShortError";
-//            return false;
-//        }
+        if (!user.getPhoneNumber().matches(PHONE_TEMPLATE)) {
+            logger.info("errorFormatPhone");
+            error = "errorFormatPhone";
+            return false;
+        }
+        if (user.getPassword().length() < 5) {
+            logger.info("passwordShortError");
+            error = "passwordShortError";
+            return false;
+        }
 
         byte[] salt = generateSalt();
         user.setSalt(salt);
@@ -42,23 +55,24 @@ public class UserService {
         user.setPassword(hashedPassword);
 
         user.setActivationCode(UUID.randomUUID().toString());
-
-        emailSenderService.sendActivationCode(user);
-
-        log.info("save working");
-        return userDAO.insert(user);
+        if (emailSenderService.sendActivationCode(user)) {
+            logger.info("user saved");
+            return userDAO.insert(user);
+        }
+        logger.info("failed to save user");
+        return false;
     }
 
     public boolean activateEmail(String code) {
         User user = userDAO.findByActivationCode(code);
         if (user == null) {
             error = "emailActivateError";
-            log.info("Email address don't activated");
+            logger.info("Email address don't activated");
             return false;
         }
         user.setEmailActivated("true");
         userDAO.setEmailActivated(user);
-        log.info("Email address activated");
+        logger.info("Email address activated");
         return true;
     }
 
@@ -70,7 +84,7 @@ public class UserService {
         User userFromDB = userDAO.findByEmail(email);
 
         if (userFromDB == null) {
-            log.info("user not register");
+            logger.info("user not register");
             error = "userNotFoundError";
             return false;
         }
@@ -79,17 +93,17 @@ public class UserService {
         String hashPasswordString = Hex.encodeHexString(hashPassword);
 
         if (!userFromDB.getPassword().equals(hashPasswordString)) {
-            log.info("Passwords do not match");
+            logger.info("Passwords do not match");
             error = "passwordError";
             return false;
         }
 
-        if(!userFromDB.getEmailActivated().equals("true")) {
-            log.info("Email not activated");
-            error = "emailActivateError";
+        if (!userFromDB.getEmailActivated().equals("true")) {
+            logger.info("Email not activated");
+            error = "emailNotActivateError";
             return false;
         }
-        log.info("User logged in");
+        logger.info("User logged in");
         return true;
     }
 
@@ -105,81 +119,126 @@ public class UserService {
         return userDAO.findByRole(Role.CRAFTSMAN);
     }
 
-    public List<User> getSortedUsers(String email, String sort, int startPosition, int totalUsers) {
+
+    public List<User> getUserMasters(int user_id) {
+        return userDAO.findUserMasters("user_id", "craftsman_id", user_id, 0);
+    }
+
+    /**
+     * the method fills in user sorting parameters and passes them to the dao
+     * @param sort - set of parameters for sorting
+     * @param pagination - limit and offset
+     * @return sorted list from dao
+     */
+    public List<User> getSortedUsers(Sort sort, Pagination pagination) {
         Map<String, Object> filterParams = new HashMap<>();
         String sortingParams = null;
         Map<String, Integer> limitingParams = new LinkedHashMap<>();
 
-        if (email != null && !email.isEmpty()) {
-            filterParams.put("email", email);
+        if (sort.getEmail() != null && !sort.getEmail().isEmpty()) {
+            filterParams.put("email", sort.getEmail());
         }
 
-        if (sort != null && !sort.equals("none")) {
-            sortingParams = sort;
+        if (sort.getSort() != null && !sort.getSort().equals("none")) {
+            sortingParams = sort.getSort();
         }
 
-        limitingParams.put("LIMIT" , totalUsers);
-        limitingParams.put("OFFSET" , startPosition);
+        limitingParams.put("LIMIT", pagination.getOrdersOnPage());
+        limitingParams.put("OFFSET", pagination.getOffset());
 
         return userDAO.findBy(filterParams, sortingParams, limitingParams);
     }
 
     public boolean changePassword(User user, String oldPassword, String newPassword, String newPasswordReaped) {
-        if (newPassword.length() > 20) {
+        byte[] salt = user.getSalt();
+
+        byte[] oldPass = user.hashPassword(oldPassword, salt);
+        String hashedOldPassword = Hex.encodeHexString(oldPass);
+
+        byte[] newPass = user.hashPassword(newPassword, salt);
+        String hashedNewPassword = Hex.encodeHexString(newPass);
+
+        if (!user.getPassword().equals(hashedOldPassword)) {
+            logger.info("oldPasswordError");
+            error = "oldPasswordError";
+            return false;
+        }
+        if (newPassword.length() < 4) {
+            logger.info("passwordShortError");
             error = "passwordShortError";
             return false;
         }
         if (!newPasswordReaped.equals(newPassword)) {
+            logger.info("repeatPasswordError");
             error = "repeatPasswordError";
             return false;
         }
-        if (user.getPassword().equals(newPassword)) {
+        if (user.getPassword().equals(hashedNewPassword)) {
+            logger.info("passwordSame");
             error = "passwordSame";
+            return false;
         }
-        user.setPassword(newPassword);
-        userDAO.setPassword(user.getId(), newPassword);
-        log.info("User: " + user.getEmail() + " change his password");
+
+        if (newPassword.length() < 5) {
+            logger.info("passwordShortError");
+            error = "passwordShortError";
+            return false;
+        }
+
+        user.setPassword(hashedNewPassword);
+
+        userDAO.setPassword(user.getId(), hashedNewPassword);
+        logger.info("User: " + user.getEmail() + " change his password");
         return true;
     }
 
-    public boolean editProfile(User user, String firstName, String lastName, String email, String phoneNumber) {
-        if (!user.getFirstName().equals(firstName) && !firstName.equals("")) {
+    public boolean editProfile(User user, String firstName, String lastName, String phoneNumber) {
+        if (!firstName.equals("")) {
             if (firstName.length() < 3) {
+                logger.info("shortFirstNameError");
                 error = "shortFirstNameError";
+                return false;
+            }
+            if (user.getFirstName().equals(firstName)) {
+                logger.info("firstNameSame");
+                error = "firstNameSame";
                 return false;
             }
             user.setFirstName(firstName);
             userDAO.setVariable("first_name", user.getId(), firstName);
-        } else {
-            error = "firstNameSame";
         }
 
-        if (!user.getLastName().equals(lastName) && !lastName.equals("")) {
+        if (!lastName.equals("")) {
             if (lastName.length() < 3) {
-                error = "shortLastNameError";
+                logger.info("lastNameShortError");
+                error = "lastNameShortError";
+                return false;
+            }
+            if (user.getLastName().equals(lastName)) {
+                logger.info("lastNameSame");
+                error = "lastNameSame";
                 return false;
             }
             user.setLastName(lastName);
             userDAO.setVariable("last_name", user.getId(), lastName);
-        } else {
-            error = "lastNameSame";
         }
 
-        if (!user.getEmail().equals(email) && !email.equals("")) {
-            // проверка
-            user.setEmail(email);
-            userDAO.setVariable("email", user.getId(), email);
-        } else {
-            error = "emailSame";
-        }
+        if (!phoneNumber.equals("")) {
 
-        if (!user.getPhoneNumber().equals(phoneNumber) && !phoneNumber.equals("")) {
-            // проверка
+            if (!phoneNumber.matches(PHONE_TEMPLATE)) {
+                logger.info("errorFormatPhone");
+                error = "errorFormatPhone";
+                return false;
+            }
+            if (user.getPhoneNumber().equals(phoneNumber)) {
+                logger.info("phoneNumberSame");
+                error = "phoneNumberSame";
+                return false;
+            }
             user.setPhoneNumber(phoneNumber);
             userDAO.setVariable("phone_number", user.getId(), phoneNumber);
-        } else {
-            error = "phoneNumberSame";
         }
+        logger.info("profile has been edited");
         return true;
     }
 
@@ -195,10 +254,7 @@ public class UserService {
         return salt;
     }
 
-
     public int getNumberOfRows() {
         return userDAO.totalRows;
     }
-
-
 }

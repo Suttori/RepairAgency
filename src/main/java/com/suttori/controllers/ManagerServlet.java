@@ -1,9 +1,12 @@
 package com.suttori.controllers;
 
 import com.suttori.entity.Order;
+import com.suttori.entity.Pagination;
+import com.suttori.entity.Sort;
 import com.suttori.entity.User;
 import com.suttori.entity.enams.OrderStatus;
 import com.suttori.service.OrderService;
+import com.suttori.service.PaginationService;
 import com.suttori.service.UserService;
 
 import javax.servlet.RequestDispatcher;
@@ -15,40 +18,41 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * the doGet method of the servlet generates a page with sorted or not ordered orders depending on the received parameters,
+ * doPost calls the appropriate methods to change the order status
+ */
 @WebServlet(name = "managerPage")
 public class ManagerServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if (changeStatus(req, resp)) {
+        User manager = (User) req.getSession().getAttribute("user");
+        if (!manager.isManager()) {
+            resp.sendRedirect(req.getContextPath() + "/");
+            return;
+        }
+        if (changeStatusManager(req, resp)) {
             return;
         }
 
-        String masterId = req.getParameter("master");
-        String status = req.getParameter("status");
-        String sort = req.getParameter("sort");
-
-        int ordersOnPage = 6;
-        int page = 1;
-        if (req.getParameter("page") != null) {
-            page = Integer.parseInt(req.getParameter("page"));
-        }
-
-        //количесвто строк, которое необходимо пропустить
-        int startPosition = page * ordersOnPage - ordersOnPage;
+        PaginationService paginationService = new PaginationService();
+        Pagination pagination = paginationService.getLimitOffsetPage(req);
+        Sort sort = paginationService.setSortParams(req);
         OrderService orderService = new OrderService();
 
-        List<Order> orders = orderService.getSortedOrders(false, 0, masterId, status, sort, startPosition, ordersOnPage);
-        //количество страниц с записями
-        int nOfPages = (int) Math.ceil(orderService.getNumberOfRows() * 1.0 / ordersOnPage);
+        List<Order> orders = orderService.getSortedOrders(false, sort, pagination);
+
+        int nOfPages = (int) Math.ceil(orderService.getNumberOfRows() * 1.0 / pagination.getOrdersOnPage());
 
         req.setAttribute("orders", orders);
         req.setAttribute("nOfPages", nOfPages);
-        req.setAttribute("page", page);
+        req.setAttribute("page", pagination.getPage());
 
         UserService userService = new UserService();
         List<User> masters = userService.getAllMasters();
         req.setAttribute("masters", masters);
+
         RequestDispatcher view = req.getRequestDispatcher("/views/managerPage.jsp");
         view.forward(req, resp);
     }
@@ -68,7 +72,7 @@ public class ManagerServlet extends HttpServlet {
         }
     }
 
-    private boolean changeStatus(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    private boolean changeStatusManager(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         if (req.getRequestURI().equals("/views/managerPage/cancel")) {
             OrderService orderService = new OrderService();
             orderService.setOrderStatus(Integer.parseInt(req.getParameter("orderId")), OrderStatus.CANCELED);

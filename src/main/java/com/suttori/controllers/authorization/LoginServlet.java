@@ -16,30 +16,26 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+/**
+ * the servlet processes the input data and, based on it,
+ * logs the user into the system, also writes cookies
+ */
 @WebServlet(name = "main")
 public class LoginServlet extends HttpServlet {
-    private final Logger logger = Logger.getLogger(LoginServlet.class);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        logger.info("doGet working");
-        if (req.getSession().getAttribute("user") == null) {
-            HttpSession session = req.getSession();
-            User user = new User();
-            session.setAttribute("user", user);
+        if (req.getSession().getAttribute("user") != null) {
+            resp.sendRedirect(req.getContextPath() + "/");
+            return;
         }
-        RequestDispatcher rd = req.getRequestDispatcher("/start-page.jsp");
+        RequestDispatcher rd = req.getRequestDispatcher("/views/start-page.jsp");
         rd.forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-//        if (!isCaptchaFill(req.getParameter("g-recaptcha-response"))) {
-//            req.setAttribute("error", "captchaError");
-//            doGet(req, resp);
-//            return;
-//        }
-        logger.info("doPost working");
+
         String email = req.getParameter("email");
         String password = req.getParameter("password");
         UserService userService = new UserService();
@@ -51,33 +47,15 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("user", user);
             session.setAttribute("lang", user.getLocale());
 
-            Cookie cookie = new Cookie("RepairAgencyCookie", String.valueOf(user.getId()));
             if (remember) {
+                Cookie cookie = new Cookie("RepairAgencyCookie", String.valueOf(user.getId()));
                 cookie.setMaxAge(60 * 60 * 24 * 30); //30 days
+                resp.addCookie(cookie);
             }
-            resp.addCookie(cookie);
             resp.sendRedirect("/profile/orders");
         } else {
             req.setAttribute("error", userService.error);
             doGet(req, resp);
         }
-    }
-
-    public static boolean isCaptchaFill(String recaptchaResponse) {
-        String googleCaptcha = "https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s";
-        try {
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(String.format(googleCaptcha, ProjectProperties.getProperty("recaptcha.secret"), recaptchaResponse)))
-                    .build();
-
-            HttpResponse<String> response = client.send(request,
-                    HttpResponse.BodyHandlers.ofString());
-
-            return response.body().split(": ")[1].split(",")[0].equals("true");
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
-        return false;
     }
 }

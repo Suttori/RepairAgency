@@ -1,10 +1,9 @@
 package com.suttori.controllers.order;
 
-import com.suttori.entity.Comment;
-import com.suttori.entity.Order;
-import com.suttori.entity.User;
+import com.suttori.entity.*;
 import com.suttori.entity.enams.OrderStatus;
 import com.suttori.service.OrderService;
+import com.suttori.service.PaginationService;
 import com.suttori.service.UserService;
 
 import javax.servlet.RequestDispatcher;
@@ -16,6 +15,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * the doGet method of the servlet generates a page with sorted or not ordered orders depending on the received parameters,
+ * the doPost method is responsible for saving a comment to an already completed order
+ */
 @WebServlet(name = "orders")
 public class OrdersServlet extends HttpServlet {
 
@@ -28,30 +31,25 @@ public class OrdersServlet extends HttpServlet {
             return;
         }
 
-
-        User user = (User) req.getSession().getAttribute("user");
-        String masterId = req.getParameter("master");
-        String status = req.getParameter("status");
-        String sort = req.getParameter("sort");
-        int ordersOnPage = 6;
-        int page = 1;
-        if (req.getParameter("page") != null) {
-            page = Integer.parseInt(req.getParameter("page"));
-        }
-        //количесвто строк, которое необходимо пропустить
-        int startPosition = page * ordersOnPage - ordersOnPage;
+        PaginationService paginationService = new PaginationService();
+        Pagination pagination = paginationService.getLimitOffsetPage(req);
+        Sort sort = paginationService.setSortParams(req);
         OrderService orderService = new OrderService();
 
-        List<Order> orders = orderService.getSortedOrders(true, user.getId(), masterId, status, sort, startPosition, ordersOnPage);
+        List<Order> orders = orderService.getSortedOrders(true, sort, pagination);
 
-        //количество страниц с записями
-        int nOfPages = (int)Math.ceil(orderService.getNumberOfRows() * 1.0 / ordersOnPage);
+        if (orders.isEmpty()) {
+            req.setAttribute("message", "orders.noOrders");
+        }
+
+        int nOfPages = (int)Math.ceil(orderService.getNumberOfRows() * 1.0 / pagination.getOrdersOnPage());
+
         req.setAttribute("orders", orders);
         req.setAttribute("nOfPages", nOfPages);
-        req.setAttribute("page", page);
+        req.setAttribute("page", pagination.getPage());
         UserService userService = new UserService();
 
-        List<User> masters = userService.getAllMasters();
+        List<User> masters = userService.getUserMasters(sort.getUser().getId());
 
         req.setAttribute("masters", masters);
         RequestDispatcher view = req.getRequestDispatcher("/views/profile/orders.jsp");
@@ -69,13 +67,10 @@ public class OrdersServlet extends HttpServlet {
         Comment comment = new Comment();
         comment.setCraftsmanId(craftsmanId);
         comment.setUserId(userId);
-//        comment.setRate(rate);
         comment.setDescription(description);
 
         OrderService orderService = new OrderService();
         if (orderService.saveComment(orderId, comment)) {
-
-
             resp.sendRedirect("/profile/orders");
         }else{
             req.setAttribute("error", orderService.error);

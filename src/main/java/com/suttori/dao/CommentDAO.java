@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommentDAO implements Dao<Comment> {
-    private int totalRows;
+
     @Override
     public boolean insert(Comment comment) {
         String addComment = "INSERT INTO comment(user_id, craftsman_id, rate, description, date) VALUES (?, ?, ?, ?, ?)";
@@ -54,37 +54,14 @@ public class CommentDAO implements Dao<Comment> {
     }
 
     @Override
-    public List<Comment> findAll(int start, int total) {
-        String find = "SELECT *, count(*) OVER() AS total_count FROM comment LIMIT ? OFFSET ?";
-        List<Comment> comments = new ArrayList<>();
-        try (Connection connection = ConnectionManager.getInstance().getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(find)) {
-            preparedStatement.setInt(1, total);
-            preparedStatement.setInt(2, start);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                totalRows = resultSet.getInt("total_count");
-                comments.add(buildObjectFromResultSet(resultSet));
-            }
-            resultSet.close();
-            return comments;
-        } catch (SQLException throwable) {
-            throwable.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
     public Comment buildObjectFromResultSet(ResultSet resultSet) throws SQLException {
         Comment comment = new Comment();
-
         comment.setId(resultSet.getInt("id"));
         comment.setUserId(resultSet.getInt("user_id"));
         comment.setCraftsmanId(resultSet.getInt("craftsman_id"));
         comment.setRate(resultSet.getInt("rate"));
         comment.setDescription(resultSet.getString("description"));
         comment.setDate(resultSet.getDate("date"));
-
         return comment;
     }
 }

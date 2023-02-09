@@ -9,7 +9,11 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
+import java.util.Enumeration;
 
+/**
+ * servlet records session and retrieves cookies
+ */
 @WebServlet(name = "/")
 public class MainServlet extends HttpServlet {
 
@@ -25,12 +29,11 @@ public class MainServlet extends HttpServlet {
                 User user = userService.getUserById(flag); // cookie == user id
                 session.setAttribute("user", user);
                 log.info("User logged by remember me");
-                resp.sendRedirect(req.getContextPath() + req.getRequestURI());
+                resp.sendRedirect("/profile/orders");
                 return;
             }
         }
-        RequestDispatcher rd = req.getRequestDispatcher("/start-page.jsp");
-        rd.forward(req, resp);
+        req.getRequestDispatcher("/views/start-page.jsp").forward(req, resp);
     }
 
     private int isUserRemembered(HttpServletRequest req) {
@@ -39,7 +42,6 @@ public class MainServlet extends HttpServlet {
         }
         for (Cookie cookie : req.getCookies()) {
             if (cookie.getName().equals("RepairAgencyCookie")) {
-                System.out.println(cookie.getName() + " " + cookie.getValue());
                 return Integer.parseInt(cookie.getValue());
             }
         }

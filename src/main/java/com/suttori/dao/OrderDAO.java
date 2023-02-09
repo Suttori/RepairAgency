@@ -40,11 +40,6 @@ public class OrderDAO implements ElasticDao<Order> {
     }
 
     @Override
-    public Order findById(int id) {
-        return null;
-    }
-
-    @Override
     public Order findById(String variable, int id) {
         String find = String.format("SELECT * FROM \"order\" WHERE %s = ?", variable);
         try (Connection connection = ConnectionManager.getInstance().getConnection();
@@ -60,163 +55,6 @@ public class OrderDAO implements ElasticDao<Order> {
         }
         return null;
     }
-
-
-    public List<Order> findByUser(String by, int value, int start, int total) {
-        String find = String.format("SELECT *, count(*) OVER() AS total_count FROM \"order\" WHERE %s = ? LIMIT ? OFFSET ?", by);
-        List<Order> orders = new ArrayList<>();
-        try (Connection connection = ConnectionManager.getInstance().getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(find)) {
-            preparedStatement.setInt(1, value);
-            preparedStatement.setInt(2, total);
-            preparedStatement.setInt(3, start);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                totalRows = resultSet.getInt("total_count");
-                orders.add(buildObjectFromResultSet(resultSet));
-            }
-            resultSet.close();
-            return orders;
-        } catch (SQLException throwable) {
-            throwable.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    public List<Order> findAll(int start, int total) {
-        String selectOrders = "Select *, count(*) OVER() AS total_count from \"order\" LIMIT ? OFFSET ?";
-        List<Order> orders = new ArrayList<>();
-        try (Connection connection = ConnectionManager.getInstance().getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(selectOrders)) {
-            preparedStatement.setInt(1, total);
-            preparedStatement.setInt(2, start);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                totalRows = resultSet.getInt("total_count");
-                Order order = buildObjectFromResultSet(resultSet);
-                orders.add(order);
-            }
-            resultSet.close();
-        } catch (SQLException throwable) {
-            throwable.printStackTrace();
-        }
-        return orders;
-    }
-
-//    public List<Order> findByMaster(String findBy, int masterId, int start, int total) {
-//        String find = String.format("SELECT *, count(*) OVER() AS total_count FROM \"order\" %s LIMIT ? OFFSET ?", findBy);
-//        List<Order> orders = new ArrayList<>();
-//        try (Connection connection = ConnectionManager.getInstance().getConnection();
-//             PreparedStatement preparedStatement = connection.prepareStatement(find)) {
-//            preparedStatement.setInt(1, masterId);
-//            preparedStatement.setInt(2, total);
-//            preparedStatement.setInt(3, start);
-//            ResultSet resultSet = preparedStatement.executeQuery();
-//            while (resultSet.next()) {
-//                totalRows = resultSet.getInt("total_count");
-//                orders.add(buildObjectFromResultSet(resultSet));
-//            }
-//            resultSet.close();
-//            return orders;
-//        } catch (SQLException throwable) {
-//            throwable.printStackTrace();
-//        }
-//        return null;
-//    }
-//
-//    public List<Order> findByStatus(String findBy, String status, int start, int total) {
-//        String find = String.format("SELECT *, count(*) OVER() AS total_count FROM \"order\" %s LIMIT ? OFFSET ?", findBy);
-//        List<Order> orders = new ArrayList<>();
-//        try (Connection connection = ConnectionManager.getInstance().getConnection();
-//             PreparedStatement preparedStatement = connection.prepareStatement(find)) {
-//            preparedStatement.setString(1, status);
-//            preparedStatement.setInt(2, total);
-//            preparedStatement.setInt(3, start);
-//            ResultSet resultSet = preparedStatement.executeQuery();
-//            while (resultSet.next()) {
-//                totalRows = resultSet.getInt("total_count");
-//                orders.add(buildObjectFromResultSet(resultSet));
-//            }
-//            resultSet.close();
-//            return orders;
-//        } catch (SQLException throwable) {
-//            throwable.printStackTrace();
-//        }
-//        return null;
-//    }
-//
-//    public List<Order> findBy(String findBy, int masterId, String status, int start, int total) {
-//        String find = String.format("SELECT *, count(*) OVER() AS total_count FROM \"order\" %s LIMIT ? OFFSET ?", findBy);
-//        List<Order> orders = new ArrayList<>();
-//        try (Connection connection = ConnectionManager.getInstance().getConnection();
-//             PreparedStatement preparedStatement = connection.prepareStatement(find)) {
-//            preparedStatement.setInt(1, masterId);
-//            preparedStatement.setString(2, status);
-//            preparedStatement.setInt(3, total);
-//            preparedStatement.setInt(4, start);
-//            ResultSet resultSet = preparedStatement.executeQuery();
-//            while (resultSet.next()) {
-//                totalRows = resultSet.getInt("total_count");
-//                orders.add(buildObjectFromResultSet(resultSet));
-//            }
-//            resultSet.close();
-//            return orders;
-//        } catch (SQLException throwable) {
-//            throwable.printStackTrace();
-//        }
-//        return null;
-//    }
-//
-//
-//
-//
-//    @Override
-//    public List<Order> findBy(String findBy, int masterId, String status, int userId, int start, int total) {
-//        String find = String.format("SELECT *, count(*) OVER() AS total_count FROM \"order\" %s LIMIT ? OFFSET ?", findBy);
-//        List<Order> orders = new ArrayList<>();
-//        try (Connection connection = ConnectionManager.getInstance().getConnection();
-//             PreparedStatement preparedStatement = connection.prepareStatement(find)) {
-//            preparedStatement.setInt(1, masterId);
-//            preparedStatement.setString(2, status);
-//            preparedStatement.setInt(3, userId);
-//            preparedStatement.setInt(4, total);
-//            preparedStatement.setInt(5, start);
-//            ResultSet resultSet = preparedStatement.executeQuery();
-//            while (resultSet.next()) {
-//                totalRows = resultSet.getInt("total_count");
-//                orders.add(buildObjectFromResultSet(resultSet));
-//            }
-//            resultSet.close();
-//            return orders;
-//        } catch (SQLException throwable) {
-//            throwable.printStackTrace();
-//        }
-//        return null;
-//    }
-//
-//
-//
-//    @Override
-//    public List<Order> findBy(String findBy, int start, int total) {
-//        String find = String.format("SELECT *, count(*) OVER() AS total_count FROM \"order\" %s LIMIT ? OFFSET ?", findBy);
-//        List<Order> orders = new ArrayList<>();
-//        try (Connection connection = ConnectionManager.getInstance().getConnection();
-//             PreparedStatement preparedStatement = connection.prepareStatement(find)) {
-//            preparedStatement.setInt(1, total);
-//            preparedStatement.setInt(2, start);
-//            ResultSet resultSet = preparedStatement.executeQuery();
-//            while (resultSet.next()) {
-//                totalRows = resultSet.getInt("total_count");
-//                orders.add(buildObjectFromResultSet(resultSet));
-//            }
-//            resultSet.close();
-//            return orders;
-//        } catch (SQLException throwable) {
-//            throwable.printStackTrace();
-//        }
-//        return null;
-//    }
 
     @Override
     public void setVariable(String variable, int orderId, String value) {
@@ -245,43 +83,15 @@ public class OrderDAO implements ElasticDao<Order> {
         }
     }
 
-    @Override
-    public void setVariable(String variable, int id, float value) {
 
-    }
-
-    @Override
-    public Order buildObjectFromResultSet(ResultSet resultSet) throws SQLException {
-        Order order = new Order();
-        order.setId(resultSet.getInt("id"));
-        order.setUserId(resultSet.getInt("user_id"));
-        order.setCraftsmanId(resultSet.getInt("craftsman_id"));
-        order.setOrderName(resultSet.getString("order_name"));
-        order.setDescription(resultSet.getString("description"));
-        order.setCommentId(resultSet.getInt("comment_id"));
-        order.setPrice(resultSet.getInt("price"));
-        order.setStatus(OrderStatus.valueOf(resultSet.getString("status")));
-        order.setDate(resultSet.getDate("date"));
-        return order;
-    }
-
-    public void setStatus(int id, OrderStatus status){
-        setVariable("status", id, status.name());
-    }
-
-    public void setPrice(int id, int price){
-        setVariable("price", id, price);
-    }
-
-    public void setMaster(int id, int masterId){
-        setVariable("craftsman_id", id, masterId);
-    }
-
-    public void setCommentId(int id, Comment comment){
-        setVariable("comment_id", id, comment.getId());
-    }
-
-
+    /**
+     * the method collects the query string from the passed parameters,
+     * executes the request depending on the number of parameters
+     * @param filterParams - filter options
+     * @param sortingParams - sorter options
+     * @param limitingParams - limit and offset
+     * @return sorted order list from dao
+     */
     @Override
     public List<Order> findBy(Map<String, Object> filterParams, String sortingParams, Map<String, Integer> limitingParams) {
 
@@ -296,7 +106,6 @@ public class OrderDAO implements ElasticDao<Order> {
 
         if (sortingParams != null) {
             stringBuilder.append(" ORDER BY ").append(sortingParams);
-            //stringBuilder.append(sortingParams.entrySet().stream().map((key, value) -> key + " " + value).collect(joining( ", "));
         }
 
         if (!limitingParams.isEmpty()) {
@@ -344,12 +153,53 @@ public class OrderDAO implements ElasticDao<Order> {
     }
 
     @Override
+    public Order buildObjectFromResultSet(ResultSet resultSet) throws SQLException {
+        Order order = new Order();
+        order.setId(resultSet.getInt("id"));
+        order.setUserId(resultSet.getInt("user_id"));
+        order.setCraftsmanId(resultSet.getInt("craftsman_id"));
+        order.setOrderName(resultSet.getString("order_name"));
+        order.setDescription(resultSet.getString("description"));
+        order.setCommentId(resultSet.getInt("comment_id"));
+        order.setPrice(resultSet.getInt("price"));
+        order.setStatus(OrderStatus.valueOf(resultSet.getString("status")));
+        order.setDate(resultSet.getDate("date"));
+        return order;
+    }
+
+    public void setStatus(int id, OrderStatus status){
+        setVariable("status", id, status.name());
+    }
+
+    public void setPrice(int id, int price){
+        setVariable("price", id, price);
+    }
+
+    public void setMaster(int id, int masterId){
+        setVariable("craftsman_id", id, masterId);
+    }
+
+    public void setCommentId(int id, Comment comment){
+        setVariable("comment_id", id, comment.getId());
+    }
+
+    @Override
+    public void setVariable(String variable, int id, float value) {
+
+    }
+
+    @Override
     public Order findBy(String byName, int value) {
         return null;
     }
 
     @Override
     public Order findBy(String byName, String value) {
+        return null;
+    }
+
+    @Override
+    public Order findById(int id) {
         return null;
     }
 }

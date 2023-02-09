@@ -13,7 +13,7 @@ import java.util.List;
 @WebFilter(filterName = "SecurityFilter", urlPatterns = {"/*"})
 public class SecurityFilter implements Filter {
 
-    private static final Logger log = Logger.getLogger(SecurityFilter.class);
+    private static final Logger logger = Logger.getLogger(SecurityFilter.class);
 
     private final List<String> START_PAGES = Arrays.asList("/", "/start-page.jsp", "/main", "/registration", "/password-reset");
 
@@ -26,24 +26,26 @@ public class SecurityFilter implements Filter {
 
         if (req.getSession().getAttribute("user") == null) {
             if (!START_PAGES.contains(uri)) {
-                log.info(uri + ": forbidden");
+                logger.info(uri + ": forbidden");
                 resp.sendRedirect("/start-page.jsp");
                 return;
             }
         }
 //        } else if (START_PAGES.contains(uri)){
 //                log.info(uri + ": forbidden");
-//                resp.sendRedirect("/views/profile.jsp");
+//                resp.sendRedirect("/views/orders");
 //                return;
 //            }
         chain.doFilter(request, response);
     }
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void destroy() {
+        logger.info( "The filter: {} has finished its work");
     }
 
     @Override
-    public void destroy() {
+    public void init(FilterConfig arg0) {
+        logger.info( "The filter: {} has begun its work");
     }
 }

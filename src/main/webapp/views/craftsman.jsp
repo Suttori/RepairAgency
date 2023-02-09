@@ -1,18 +1,13 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: y
-  Date: 18.12.2022
-  Time: 17:17
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page isELIgnored="false" %>
+<fmt:setLocale value="${sessionScope.lang}"/>
+<fmt:setBundle basename="resources"/>
 <!DOCTYPE html>
 <html lang="En">
 <head>
-
+    <title><fmt:message key="header.craftsmanPage"/></title>
 </head>
 <body>
 <jsp:include page="../views/includes/header.jsp"/>
@@ -21,116 +16,112 @@
     <div class="row">
         <div class="col-2"></div>
         <div class="col-10">
-
-
             <form method="get" action="/views/craftsman" class="form-inline">
                 <div class="row justify-content-evenly">
-
-
                     <div class="col-3">
                         <select name="status" class="form-control ml-2">
-                            <option value="ALL"> Всі</option>
+                            <option value="ALL"><fmt:message key="ALL"/></option>
                             <c:choose>
                                 <c:when test="${param['status'] != null}">
                                     <option selected hidden value="${param['status']}">
                                         <fmt:message key="${param['status']}"/>
                                     </option>
-                                    <option value="PAID">PAID</option>
+                                    <option value="PAID"><fmt:message key="PAID"/></option>
                                 </c:when>
                                 <c:otherwise>
-                                    <option value="PAID" selected>PAID</option>
+                                    <option value="PAID" selected><fmt:message key="PAID"/></option>
                                 </c:otherwise>
                             </c:choose>
-                            <option value="PAID">PAID</option>
-                            <option value="IN_PROGRESS">IN_PROGRESS</option>
-                            <option value="COMPLETED">COMPLETED</option>
+                            <option value="IN_PROGRESS"><fmt:message key="IN_PROGRESS"/></option>
+                            <option value="COMPLETED"><fmt:message key="COMPLETED"/></option>
+                            <option value="CANCELED"><fmt:message key="CANCELED"/></option>
                         </select>
                     </div>
                     <div class="col-3">
-
                         <select name="sort" class="form-control ml-2">
                             <c:choose>
                                 <c:when test="${param['sort'] != null}">
                                     <option selected hidden value="${param['sort']}">
                                         <fmt:message key="${param['sort']}"/>
                                     </option>
-                                    <option value="none">none</option>
+                                    <option value="none"><fmt:message key="none"/></option>
                                 </c:when>
                                 <c:otherwise>
-                                    <option value="none" selected> Без сортування</option>
+                                    <option value="none" selected><fmt:message key="none"/></option>
                                 </c:otherwise>
                             </c:choose>
 
-                            <option value="date ASC">date ASC</option>
-                            <option value="date DESC">date DESC</option>
-                            <option value="price ASC">price ASC</option>
-                            <option value="price DESC">price DESC</option>
+                            <option value="date ASC"><fmt:message key="date ASC"/></option>
+                            <option value="date DESC"><fmt:message key="date DESC"/></option>
+                            <option value="price ASC"><fmt:message key="price ASC"/></option>
+                            <option value="price DESC"><fmt:message key="price DESC"/></option>
                         </select>
                     </div>
                     <div class="col-3">
-                        <button type="submit" class="btn btn-primary ml-2"> Пошук</button>
+                        <button type="submit" class="btn btn-primary ml-2"><fmt:message key="search"/></button>
                     </div>
                     <div class="col-3">
-
                     </div>
-
-
                 </div>
             </form>
-
             <br>
-
             <div class="row row-cols-1 row-cols-md-3 g-4">
                 <c:forEach var="order" items="${orders}">
                     <div class="col">
                         <div class="card h-100">
                             <div class="card-body">
-                                <h5 class="card-title"> Проблема: ${order.orderName}</h5>
+                                <h5 class="card-title"><fmt:message key="orders.problem"/>: ${order.orderName}</h5>
                                 <br>
-                                <h6 class="card-subtitle mb-2"> Статус: ${order.status}</h6>
+                                <h6 class="card-subtitle mb-2"><fmt:message key="orders.status"/>: ${order.status}</h6>
                                 <br>
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                         data-bs-target="#exampleModal"
-                                        data-bs-whatever="${order.description}"> Переглянути детальний опис проблеми
+                                        data-bs-whatever="${order.description}"><fmt:message
+                                        key="orders.showDescription"/>
                                 </button>
                                 <br>
                                 <br>
                                 <c:set var="orderUser" value="${order.getUser()}"/>
-                                <h6 class="mt-0"> Замовник: ${orderUser.fullName}</h6>
+                                <h6 class="mt-0"><fmt:message key="orders.customer"/>: ${orderUser.fullName}</h6>
                                 <br>
                                 <c:if test="${order.craftsmanId > 0}">
                                     <c:set var="orderCraftsman" value="${order.getCraftsman()}"/>
                                     <h6 class="card-subtitle mb-2">
-                                        Майстер: ${orderCraftsman.id} ${orderCraftsman.getFullName()} </h6>
+                                        <fmt:message
+                                                key="orders.craftsman"/>: ${orderCraftsman.id}. ${orderCraftsman.getFullName()} </h6>
                                 </c:if>
                                 <c:if test="${order.price > 0}">
                                     <br>
-                                    <h6 class="card-subtitle mb-2"> Вартість послуги: ${order.price}</h6>
+                                    <h6 class="card-subtitle mb-2"><fmt:message
+                                            key="orders.price"/>: ${order.price}</h6>
                                 </c:if>
-
                             </div>
-
-
                             <div class="card-footer">
                                 <div class="row">
                                     <div class="col">
-                                        <small class="text-muted"> Дата замовлення: ${order.date}</small>
+                                        <small class="text-muted"> <fmt:message
+                                                key="orders.date"/>: ${order.date}</small>
                                     </div>
                                     <div class="col">
-                                        <c:if test="${!order.isCompleted() && !order.isPendingPayment()}">
-                                        <div class="dropdown gap-2 d-md-flex justify-content-md-end">
-                                            <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                Змінити статус
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <c:if test="${order.isPaid()}">
-                                                    <li><a class="dropdown-item" href="/views/craftsman/execute?orderId=${order.id}"> Взяти в роботу</a></li>
-                                                </c:if>
-                                                <c:if test="${order.isInProgress()}">
-                                                    <li><a class="dropdown-item" href="/views/craftsman/complete?orderId=${order.id}"> Замовлення виконано </a></li>
-                                                </c:if>
-                                            </ul>
-                                        </div>
+                                        <c:if test="${!order.isCompleted() && !order.isPendingPayment() && !order.isCanceled()}">
+                                            <div class="dropdown gap-2 d-md-flex justify-content-md-end">
+                                                <button class="btn btn-outline-primary dropdown-toggle" type="button"
+                                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <fmt:message key="orders.changeStatus"/>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <c:if test="${order.isPaid()}">
+                                                        <li><a class="dropdown-item"
+                                                               href="/views/craftsman/execute?orderId=${order.id}">
+                                                            <fmt:message key="IN_PROGRESS"/></a></li>
+                                                    </c:if>
+                                                    <c:if test="${order.isInProgress()}">
+                                                        <li><a class="dropdown-item"
+                                                               href="/views/craftsman/complete?orderId=${order.id}">
+                                                            <fmt:message key="COMPLETED"/> </a></li>
+                                                    </c:if>
+                                                </ul>
+                                            </div>
                                         </c:if>
                                     </div>
                                 </div>
@@ -150,7 +141,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="exampleModalLabel"></h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрити"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-xxl">
@@ -158,7 +149,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрити</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><fmt:message
+                        key="orders.close"/></button>
             </div>
         </div>
     </div>
@@ -169,19 +161,14 @@
     const exampleModal = document.getElementById('exampleModal')
     if (exampleModal) {
         exampleModal.addEventListener('show.bs.modal', event => {
-            // Button that triggered the modal
             const button = event.relatedTarget
-            // Extract info from data-bs-* attributes
             const recipient = button.getAttribute('data-bs-whatever')
-            // Update the modal's content.
             const modalTitle = exampleModal.querySelector('.modal-title')
             const modalBodyInput = exampleModal.querySelector('.modal-body textarea')
-
-            modalTitle.textContent = `Детальний опис проблеми ${recipient}`
+            modalTitle.textContent = `<fmt:message key="orders.description"/> ${recipient}`
             modalBodyInput.value = recipient
         })
     }
 </script>
-<%--<jsp:include page="../includes/footer.jsp"/>--%>
 </body>
 </html>

@@ -10,6 +10,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * the servlet handles the email activation
+ * request and calls the appropriate method
+ */
 @WebServlet(name = "activate")
 public class EmailSenderServlet extends HttpServlet {
     @Override
@@ -21,6 +25,6 @@ public class EmailSenderServlet extends HttpServlet {
         } else {
             req.setAttribute("error", userService.error);
         }
-        req.getRequestDispatcher("/start-page.jsp").forward(req, resp);
+        resp.sendRedirect("/views/registration/activateSuccessful.jsp");
     }
 }

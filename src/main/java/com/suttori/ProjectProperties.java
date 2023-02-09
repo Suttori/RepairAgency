@@ -1,10 +1,13 @@
 package com.suttori;
 
+import org.apache.log4j.Logger;
+
 import java.io.*;
 import java.util.Properties;
 
 public class ProjectProperties {
 
+    private static Logger logger = Logger.getLogger(ProjectProperties.class);
     private static String fileName = "app.properties";
     private static Properties props = setProperties();
 
@@ -27,7 +30,7 @@ public class ProjectProperties {
         try (InputStream resource = ProjectProperties.class.getClassLoader().getResourceAsStream(fileName)) {
             props.load(resource);
         } catch (IOException exception) {
-            System.out.println("smth wrong with property file");
+            logger.info("error set properties");
             exception.printStackTrace();
         }
         return props;

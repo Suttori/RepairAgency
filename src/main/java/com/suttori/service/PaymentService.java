@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 public class PaymentService {
 
     UserDAO userDAO = new UserDAO();
+    OrderService orderService = new OrderService();
 
     Logger logger = Logger.getLogger(PaymentService.class);
     public String error;
@@ -19,14 +20,19 @@ public class PaymentService {
             logger.info("Negative sum");
             return false;
         }
+        if (sum >= Integer.MAX_VALUE) {
+            error = "tooBigAmount";
+            logger.info("too big amount");
+            return false;
+        }
         user.setBalance(user.getBalance() + sum);
         userDAO.setBalance(user.getId(), user.getBalance());
-        logger.info("Top up user balance");
+        logger.info("user balance topped up");
         return true;
     }
 
     public boolean payForOrder(User user, int orderId) {
-        OrderService orderService = new OrderService();
+
         Order order = orderService.getById(orderId);
 
         if (user.getId() != order.getUserId()) {
@@ -49,16 +55,10 @@ public class PaymentService {
             return false;
         }
 
-
         orderService.setOrderStatus(orderId, OrderStatus.PAID);
-
         user.setBalance(sum);
         userDAO.setBalance(user.getId(), user.getBalance());
-
         logger.info("User paid for order");
         return true;
-
     }
-
-
 }

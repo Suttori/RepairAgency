@@ -10,7 +10,6 @@ public interface ElasticDao<T> extends Dao<T> {
 
     List<T> findBy(Map<String, Object> filterParams, String sortingParams, Map<String, Integer> limitingParams);
 
-
     T findBy(String by, int value);
 
     T findBy(String by, String value);
