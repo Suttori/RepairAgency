@@ -15,6 +15,7 @@ import java.io.IOException;
 public class LogoutServlet extends HttpServlet {
 
     private final Logger logger = Logger.getLogger(LogoutServlet.class);
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession(false);
@@ -24,6 +25,7 @@ public class LogoutServlet extends HttpServlet {
             cookie.setPath("/");
             resp.addCookie(cookie);
             session.invalidate();
+            logger.info("user logout");
             resp.sendRedirect(req.getContextPath() + "/");
         }
     }

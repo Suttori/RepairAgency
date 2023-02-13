@@ -19,13 +19,14 @@ import java.io.IOException;
 public class PaymentServlet extends HttpServlet {
 
     Logger logger = Logger.getLogger(PaymentServlet.class);
+    PaymentService paymentService = new PaymentService();
+
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         User user = (User) req.getSession().getAttribute("user");
         String orderId = req.getParameter("orderId");
         if (orderId != null) {
-            PaymentService paymentService = new PaymentService();
             boolean successful = paymentService.payForOrder(user, Integer.parseInt(orderId));
             if (successful) {
                 req.setAttribute("message", "orderPaymentSuccess");
@@ -34,7 +35,6 @@ public class PaymentServlet extends HttpServlet {
             }
         }
         req.getRequestDispatcher("/profile/orders").forward(req, resp);
-//        resp.sendRedirect("/profile/orders");
     }
 
     @Override
@@ -45,7 +45,6 @@ public class PaymentServlet extends HttpServlet {
             return;
         }
         float sum = Integer.parseInt(req.getParameter("sum"));
-        PaymentService paymentService = new PaymentService();
         User user = (User) req.getSession().getAttribute("user");
         paymentService.topUpBalance(user, sum);
         resp.sendRedirect("/profile/orders");

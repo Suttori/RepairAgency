@@ -22,10 +22,14 @@ import java.util.List;
  */
 @WebServlet(name = "craftsman")
 public class CraftsmanServlet extends HttpServlet {
+
+    PaginationService paginationService = new PaginationService();
+    OrderService orderService = new OrderService();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        User master = (User) req.getSession().getAttribute("user");
-        if (!master.isCraftsman()) {
+        User craftsman = (User) req.getSession().getAttribute("user");
+        if (!craftsman.isCraftsman()) {
             resp.sendRedirect(req.getContextPath() + "/");
             return;
         }
@@ -33,10 +37,8 @@ public class CraftsmanServlet extends HttpServlet {
             return;
         }
 
-        PaginationService paginationService = new PaginationService();
         Pagination pagination = paginationService.getLimitOffsetPage(req);
         Sort sort = paginationService.setSortParams(req);
-        OrderService orderService = new OrderService();
 
         List<Order> orders = orderService.getSortedOrders(false, sort, pagination);
         int nOfPages = (int) Math.ceil(orderService.getNumberOfRows() * 1.0 / 6);
@@ -51,7 +53,6 @@ public class CraftsmanServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         int orderId = Integer.parseInt(req.getParameter("orderId"));
-        OrderService orderService = new OrderService();
         if (req.getRequestURI().equals("/craftsman/complete")) {
             orderService.setOrderStatus(orderId, OrderStatus.COMPLETED);
         } else if (req.getRequestURI().equals("/views/craftsman/execute")) {
@@ -60,14 +61,12 @@ public class CraftsmanServlet extends HttpServlet {
         resp.sendRedirect(req.getContextPath() + "/views/craftsman");
     }
 
-    private boolean changeStatusCraftsman(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected boolean changeStatusCraftsman(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         if (req.getRequestURI().equals("/views/craftsman/execute")) {
-            OrderService orderService = new OrderService();
             orderService.setOrderStatus(Integer.parseInt(req.getParameter("orderId")), OrderStatus.IN_PROGRESS);
             resp.sendRedirect(req.getContextPath() + "/views/craftsman");
             return true;
         } else if (req.getRequestURI().equals("/views/craftsman/complete")) {
-            OrderService orderService = new OrderService();
             orderService.setOrderStatus(Integer.parseInt(req.getParameter("orderId")), OrderStatus.COMPLETED);
             resp.sendRedirect(req.getContextPath() + "/views/craftsman");
             return true;

@@ -21,20 +21,20 @@ import java.util.List;
  */
 @WebServlet(name = "orders")
 public class OrdersServlet extends HttpServlet {
+    OrderService orderService = new OrderService();
+    UserService userService = new UserService();
+    PaginationService paginationService = new PaginationService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (req.getRequestURI().equals("/profile/orders/cancel")) {
-            OrderService orderService = new OrderService();
             orderService.setOrderStatus(Integer.parseInt(req.getParameter("orderId")), OrderStatus.CANCELED);
             resp.sendRedirect(req.getContextPath() + "/profile/orders");
             return;
         }
 
-        PaginationService paginationService = new PaginationService();
         Pagination pagination = paginationService.getLimitOffsetPage(req);
         Sort sort = paginationService.setSortParams(req);
-        OrderService orderService = new OrderService();
 
         List<Order> orders = orderService.getSortedOrders(true, sort, pagination);
 
@@ -47,13 +47,11 @@ public class OrdersServlet extends HttpServlet {
         req.setAttribute("orders", orders);
         req.setAttribute("nOfPages", nOfPages);
         req.setAttribute("page", pagination.getPage());
-        UserService userService = new UserService();
 
         List<User> masters = userService.getUserMasters(sort.getUser().getId());
 
         req.setAttribute("masters", masters);
-        RequestDispatcher view = req.getRequestDispatcher("/views/profile/orders.jsp");
-        view.forward(req, resp);
+        req.getRequestDispatcher("/views/profile/orders.jsp").forward(req, resp);
     }
 
     @Override
@@ -69,7 +67,6 @@ public class OrdersServlet extends HttpServlet {
         comment.setUserId(userId);
         comment.setDescription(description);
 
-        OrderService orderService = new OrderService();
         if (orderService.saveComment(orderId, comment)) {
             resp.sendRedirect("/profile/orders");
         }else{

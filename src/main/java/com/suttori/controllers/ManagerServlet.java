@@ -24,6 +24,9 @@ import java.util.List;
  */
 @WebServlet(name = "managerPage")
 public class ManagerServlet extends HttpServlet {
+    PaginationService paginationService = new PaginationService();
+    OrderService orderService = new OrderService();
+    UserService userService = new UserService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -36,11 +39,9 @@ public class ManagerServlet extends HttpServlet {
             return;
         }
 
-        PaginationService paginationService = new PaginationService();
+
         Pagination pagination = paginationService.getLimitOffsetPage(req);
         Sort sort = paginationService.setSortParams(req);
-        OrderService orderService = new OrderService();
-
         List<Order> orders = orderService.getSortedOrders(false, sort, pagination);
 
         int nOfPages = (int) Math.ceil(orderService.getNumberOfRows() * 1.0 / pagination.getOrdersOnPage());
@@ -49,12 +50,10 @@ public class ManagerServlet extends HttpServlet {
         req.setAttribute("nOfPages", nOfPages);
         req.setAttribute("page", pagination.getPage());
 
-        UserService userService = new UserService();
         List<User> masters = userService.getAllMasters();
         req.setAttribute("masters", masters);
 
-        RequestDispatcher view = req.getRequestDispatcher("/views/managerPage.jsp");
-        view.forward(req, resp);
+        req.getRequestDispatcher("/views/managerPage.jsp").forward(req, resp);
     }
 
     @Override
@@ -62,8 +61,6 @@ public class ManagerServlet extends HttpServlet {
         int masterId = Integer.parseInt(req.getParameter("selectedMaster"));
         int orderId = Integer.parseInt(req.getParameter("orderId"));
         int price = Integer.parseInt(req.getParameter("price"));
-
-        OrderService orderService = new OrderService();
         if (orderService.saveManagerAnswer(price, masterId, orderId)) {
             resp.sendRedirect(req.getContextPath() + "/views/managerPage");
         } else {
@@ -74,17 +71,14 @@ public class ManagerServlet extends HttpServlet {
 
     private boolean changeStatusManager(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         if (req.getRequestURI().equals("/views/managerPage/cancel")) {
-            OrderService orderService = new OrderService();
             orderService.setOrderStatus(Integer.parseInt(req.getParameter("orderId")), OrderStatus.CANCELED);
             resp.sendRedirect(req.getContextPath() + "/views/managerPage");
             return true;
         } else if (req.getRequestURI().equals("/views/managerPage/isPendingPayment")) {
-            OrderService orderService = new OrderService();
             orderService.setOrderStatus(Integer.parseInt(req.getParameter("orderId")), OrderStatus.PENDING_PAYMENT);
             resp.sendRedirect(req.getContextPath() + "/views/managerPage");
             return true;
         } else if (req.getRequestURI().equals("/views/managerPage/isPaid")) {
-            OrderService orderService = new OrderService();
             orderService.setOrderStatus(Integer.parseInt(req.getParameter("orderId")), OrderStatus.PAID);
             resp.sendRedirect(req.getContextPath() + "/views/managerPage");
             return true;

@@ -23,6 +23,8 @@ import java.net.http.HttpResponse;
 @WebServlet(name = "main")
 public class LoginServlet extends HttpServlet {
 
+    UserService userService = new UserService();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (req.getSession().getAttribute("user") != null) {
@@ -35,18 +37,14 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
         String email = req.getParameter("email");
         String password = req.getParameter("password");
-        UserService userService = new UserService();
-
         boolean remember = req.getParameter("rememberMe") != null;
         if (userService.userLogin(email, password)) {
             User user = userService.getUserByEmail(email);
             HttpSession session = req.getSession();
             session.setAttribute("user", user);
             session.setAttribute("lang", user.getLocale());
-
             if (remember) {
                 Cookie cookie = new Cookie("RepairAgencyCookie", String.valueOf(user.getId()));
                 cookie.setMaxAge(60 * 60 * 24 * 30); //30 days

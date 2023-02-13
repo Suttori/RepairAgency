@@ -24,6 +24,10 @@ import java.util.List;
 @WebServlet(name = "userList")
 public class UserListServlet extends HttpServlet {
 
+    PaginationService paginationService = new PaginationService();
+    UserService userService = new UserService();
+    PaymentService paymentService = new PaymentService();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         User manager = (User) req.getSession().getAttribute("user");
@@ -32,11 +36,8 @@ public class UserListServlet extends HttpServlet {
             return;
         }
 
-        PaginationService paginationService = new PaginationService();
         Pagination pagination = paginationService.getLimitOffsetPage(req);
         Sort sort = paginationService.setSortParams(req);
-
-        UserService userService = new UserService();
 
         List<User> users = userService.getSortedUsers(sort, pagination);
 
@@ -53,8 +54,6 @@ public class UserListServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         int userId = Integer.parseInt(req.getParameter("userId"));
         int sum = Integer.parseInt(req.getParameter("sum"));
-        PaymentService paymentService = new PaymentService();
-        UserService userService = new UserService();
         if (!paymentService.topUpBalance(userService.getUserById(userId), sum)) {
             req.setAttribute("error", paymentService.error);
         }

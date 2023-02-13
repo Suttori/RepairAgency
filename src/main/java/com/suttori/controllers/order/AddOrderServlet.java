@@ -18,18 +18,20 @@ import java.io.IOException;
  */
 @WebServlet(name = "order")
 public class AddOrderServlet extends HttpServlet {
+
     OrderService orderService = new OrderService();
-    Order order = new Order();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.getRequestDispatcher("/views/profile/addOrder.jsp").forward(req, resp);
     }
 
     @Override
-    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         User user = (User) req.getSession().getAttribute("user");
         String nameOrder = req.getParameter("nameOrder");
         String description = req.getParameter("description");
+        Order order = new Order();
         order.setOrderName(nameOrder);
         order.setDescription(description);
         order.setUserId(user.getId());

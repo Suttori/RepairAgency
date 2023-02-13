@@ -27,6 +27,7 @@ import java.net.http.HttpResponse;
 public class RegistrationServlet extends HttpServlet {
 
     private final Logger log = Logger.getLogger(RegistrationServlet.class);
+    UserService userService = new UserService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -41,7 +42,6 @@ public class RegistrationServlet extends HttpServlet {
             return;
         }
 
-        UserService userService = new UserService();
         User user = new User();
         user.setFirstName(req.getParameter("firstName"));
         user.setLastName(req.getParameter("lastName"));
@@ -52,15 +52,15 @@ public class RegistrationServlet extends HttpServlet {
         if (userService.save(user)) {
             HttpSession session = req.getSession();
             session.setAttribute("user", user);
-            resp.sendRedirect("/views/registration/registrationSuccessful.jsp");
             log.info("Registration successful");
+            resp.sendRedirect("/views/registration/registrationSuccessful.jsp");
         } else {
             req.setAttribute("error", userService.error);
             doGet(req, resp);
         }
     }
 
-    public static boolean isCaptchaFill(String recaptchaResponse) {
+    public boolean isCaptchaFill(String recaptchaResponse) {
         String googleCaptcha = "https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s";
         try {
             HttpClient client = HttpClient.newHttpClient();

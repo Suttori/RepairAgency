@@ -16,9 +16,11 @@ import java.io.IOException;
  */
 @WebServlet(name = "activate")
 public class EmailSenderServlet extends HttpServlet {
+
+    UserService userService = new UserService();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        UserService userService = new UserService();
         boolean isActivated = userService.activateEmail(req.getParameter("code"));
         if (isActivated) {
             req.setAttribute("message", "emailActivateSuccess");

@@ -17,6 +17,8 @@ import java.io.IOException;
 @WebServlet(name = "edit")
 public class ProfileEditServlet extends HttpServlet {
 
+    UserService userService = new UserService();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.getRequestDispatcher("/views/profile/edit.jsp").forward(req, resp);
@@ -25,7 +27,6 @@ public class ProfileEditServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         User user = (User) req.getSession().getAttribute("user");
-        UserService userService = new UserService();
         String uri = req.getRequestURI();
         if (uri.equals("/profile/edit/password")) {
             String oldPassword = req.getParameter("oldPassword");
